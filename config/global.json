@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "BarLiftWebApp": {
+            "applicationId": "5DZi1FrdZcwBKXIxMplWsqYu3cEEumlmFDB1kKnC", 
+            "masterKey": "KUNHBmLRwJUsnDpcy9CtM5kXTNckJlXNNwlDVQJq"
+        }, 
+        "_default": {
+            "link": "BarLiftWebApp"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.19"
+    }
+}

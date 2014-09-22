@@ -1,0 +1,392 @@
+
+<html>
+  <head>
+  <!-- Latest compiled and minified CSS -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+  <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/parse/1.2.9/parse.min.js"></script>
+  <script type="text/javascript">
+  /**
+  * Character Counter v1.0
+  * ======================
+  *
+  * Character Counter is a simple, Twitter style character counter.
+  * 
+  * https://github.com/dtisgodsson/jquery-character-counter
+  *
+  * @author Darren Taylor
+  * @author Email: shout@darrenonthe.net
+  * @author Twitter: darrentaytay
+  * @author Website: http://darrenonthe.net
+  *
+  */
+  (function($) {
+
+      $.fn.characterCounter = function(options){
+        
+          var defaults = {
+              exceeded: false,
+              counterSelector: false,
+              limit: 150,
+              counterWrapper: 'span',
+              counterCssClass: 'counter',
+              counterFormat: '%1',
+              counterExceededCssClass: 'exceeded',
+              onExceed: function(count) {},
+              onDeceed: function(count) {},
+              customFields: {},
+          }; 
+              
+          var options = $.extend(defaults, options);
+
+          return this.each(function() {
+              if (!options.counterSelector) {
+                $(this).after(generateCounter());            
+              }
+              bindEvents(this);
+              checkCount(this);
+          });
+          
+          function customFields(params)
+          {
+              var html='';
+
+              for (var i in params)
+              {
+                  html += ' ' + i + '="' + params[i] + '"';
+              }
+
+              return html;
+          }
+
+          function generateCounter()
+          {
+              var classString = options.counterCssClass;
+
+              if(options.customFields.class)
+              {
+                  classString += " " + options.customFields.class;
+                  delete options.customFields['class'];
+              }
+              
+              return '<'+ options.counterWrapper +customFields(options.customFields)+' class="' + classString + '"></'+ options.counterWrapper +'>';
+          }
+
+          function renderText(count)
+          {
+              return options.counterFormat.replace(/%1/, count);
+          }
+
+          function checkCount(element)
+          {
+              var characterCount  = $(element).val().length;
+              var remaining        = options.limit - characterCount;
+              var counter = options.counterSelector ? $(options.counterSelector) : $(element).next("." + options.counterCssClass);
+
+              if( remaining < 0 )
+              {
+                  counter.addClass(options.counterExceededCssClass);
+                  options.exceeded = true;
+                  options.onExceed(characterCount);
+              }
+              else
+              {
+                  if(options.exceeded) {
+                      counter.removeClass(options.counterExceededCssClass);
+                      options.onDeceed(characterCount);
+                      options.exceeded = false;
+                  }
+              }
+
+              counter.html(renderText(remaining));
+          };    
+
+          function bindEvents(element)
+          {
+              $(element)
+                  .bind("keyup", function () { 
+                      checkCount(element); 
+                  })
+                  .bind("paste", function () { 
+                      var self = this;
+                      setTimeout(function () { checkCount(self); }, 0);
+                  });
+          }
+      };
+  })(jQuery);
+  </script>
+<script>
+  Parse.initialize("5DZi1FrdZcwBKXIxMplWsqYu3cEEumlmFDB1kKnC","G7yhVdBRY3S2jvjkHKddlsES5YZu1z99Nh9JPLTN")
+  var Deal = Parse.Object.extend("Deal");
+</script>
+    <title>BarLift - Drink Spontaneously</title>
+    <style>
+    .sp-help-block{
+      display: block;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      color: #000;
+      font-style: italic;
+    }
+    .help-block{
+      color:#000;
+      font-style: italic;
+    }
+    .ui-autocomplete {
+      max-height: 20px;
+      overflow-y: auto;
+      /* prevent horizontal scrollbar */
+      overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+     * we use height instead, but this forces the menu to always be this tall
+     */
+   html .ui-autocomplete {
+      height: 20px;
+    }
+    body { font-family: Helvetica, Arial, sans-serif; }
+    h1 { font-size: 30px; margin: 0; }
+    p { margin: 40px 0; }
+    em { font-family: monospace; }
+    a { color: #5298fc; text-decoration: none; }
+    .exceeded {
+    color: red;
+    }
+    </style>
+  </head>
+  <body>
+<div class="jumbotron" style="margin-bottom:0px;background:url('http://adateinthelifeof.files.wordpress.com/2011/01/disco-lights.jpg')"> 
+  <h1><img style="margin-left:400px;" src="http://barliftapp.com/images/barliftlogo.svg"/></h1>
+  <div style="background-color:white;width: 460px;padding: 30px;margin-left: 460px;">
+    <form id="deal-form" method="post" action="viewDeal" role="form" style="width:400px;">
+      <label for="deal-name">Deal Name</label>
+      <input type="text" class="form-control" id="deal-name" placeholder="Enter Deal Name">
+      <label for="bar-name">Bar/Restaurant Name</label>
+      <input type="text" style="margin-bottom:30px;" class="form-control" id="bar-name" placeholder="Enter Bar/Restaurant Name">
+      <label for="address">Bar/Restaurant Address</label>
+      <textarea rows="3" type="text" style="margin-bottom:30px;" class="form-control" id="address" placeholder="Enter Bar/Restaurant Address"></textarea>
+      <label for="deal-date">Deal Start Date</label>
+      <input type="date" class="form-control" id="deal-start-date">
+      <label for="deal-date">Deal Start Time</label>
+      <input type="time" class="form-control" id="deal-start-time">
+      <label for="deal-date">Deal End Date</label>
+      <input type="date" class="form-control" id="deal-end-date">
+      <label for="deal-date">Deal End Time</label>
+      <input type="time" class="form-control" id="deal-end-time">
+      <label for="deal-qty">Deal Qty</label>
+      <input class="form-control" id="deal-qty">
+      <label for="school-name">School/Community</label>
+      <select  class="form-control" id="school-name">
+      <option class="form-control" value="Northwestern" >Northwestern</option>
+      <option class="form-control" value="Michigan">Michigan</option>
+      <option class="form-control" value="Michigan">Arizona State</option>
+      <select>
+      <label for="image-url" style="display:block;">Image URL</label>
+      <input type="text" class="form-control" id="image-url" placeholder="Add Bar Logo URL (HQ only)">
+      <script type="text/javascript">
+      var q = new Parse.Query(Deal);
+      q.select("location_name", "address", "image_url");
+      q.find().then(function(results){
+        var bar_info = [];
+        var bar_names = [];
+        for(var i = 0; i < results.length; i++){
+          bar_info.push({"location":results[i].attributes.location_name, "img":results[i].attributes.image_url, "address":results[i].attributes.address});
+          bar_names.push(results[i].attributes.location_name);
+        }
+
+        $( "#bar-name" ).autocomplete({
+          source: bar_names
+        });
+        $("#bar-name").on('autocompletechange',function(){
+          for(var i = 0; i < bar_info.length; i++){
+            if(bar_info[i].location == $("#bar-name").val()){
+              $("#address").val(bar_info[i].address);
+              $("#image-url").val(bar_info[i].img);
+            }
+          }
+        });
+      });
+      </script>
+      <label for="deal-desc">Deal Description</label>
+      <textarea rows="3" class="form-control" id="deal-desc" placeholder="Enter Deal Description"></textarea>
+      <label for="deal-desc">Special Deal Included</label>
+      <select  class="form-control" id="special-included">
+      <option class="form-control" value="No" >No</option>
+      <option class="form-control" value="Yes">Yes</option>
+      <select>
+      <label for="sp-deal-name" class="label-special-deal" style="display:block;">Special Deal Name</label>
+      <input  type="text" class="form-control" id="sp-deal-name" placeholder="Enter Special Deal Name">
+      <label class="label-special-deal" for="sp-deal-desc">Special Deal Description</label>
+      <textarea rows="3" class="form-control" id="sp-deal-desc" placeholder="Enter Special Deal Description"></textarea>
+      <label for="deal-date">Special Deal Start Date</label>
+      <input type="date" class="form-control" id="sp-deal-start-date">
+      <label for="deal-date">Special Deal Start Time</label>
+      <input type="time" class="form-control" id="sp-deal-start-time">
+      <label for="deal-date">Special Deal End Date</label>
+      <input type="date" class="form-control" id="sp-deal-end-date">
+      <label for="deal-date">Special Deal End Time</label>
+      <input type="time" class="form-control" id="sp-deal-end-time">
+      <label class="label-special-deal" for="sp-deal-qty">Special Deal Qty</label>
+      <input  type="text" class="form-control" id="sp-deal-qty" placeholder="Enter Special Deal Quantity (1-15)">
+      <script>
+      $("#sp-deal-name").characterCounter({
+      limit: 40, // characters limit
+      counterSelector: false, // allow one or more counters to be specified by a jQuery selector
+      counterWrapper: 'span', // the element you wish to wrap your counter in.
+      counterCssClass: 'sp-help-block', // the CSS class to apply to your counter.
+      counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
+      counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
+      onExceed: function(count) {alert("Character Count Exceeded")}
+      }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
+      $("#bar-name").characterCounter({
+      limit: 40, // characters limit
+      counterSelector: false, // allow one or more counters to be specified by a jQuery selector
+      counterWrapper: 'span', // the element you wish to wrap your counter in.
+      counterCssClass: 'sp-help-block', // the CSS class to apply to your counter.
+      counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
+      counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
+      onExceed: function(count) {alert("Character Count Exceeded")}
+      }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
+
+      $("#sp-deal-desc").characterCounter({
+      limit: 110, // characters limit
+      counterSelector: false, // allow one or more counters to be specified by a jQuery selector
+      counterWrapper: 'span', // the element you wish to wrap your counter in.
+      counterCssClass: 'sp-help-block', // the CSS class to apply to your counter.
+      counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
+      counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
+      onExceed: function(count) {alert("Character Count Exceeded")}
+      }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
+      $("#sp-deal-name").hide();
+      $("#sp-deal-desc").hide();
+      $("#sp-deal-qty").hide();
+      $(".label-special-deal").hide();
+      $(".sp-help-block").hide();
+      $("#special-included").on('change', function(){
+        if($("#special-included").val() == "Yes"){
+          $("#sp-deal-name").show();
+          $("#sp-deal-desc").show();
+          $("#sp-deal-qty").show();
+          $(".sp-help-block").show();
+          $(".label-special-deal").show();
+
+        }
+        else if($("#special-included").val() == "No"){
+          $("#sp-deal-name").hide();
+          $("#sp-deal-desc").hide();
+          $("#sp-deal-qty").hide();
+        }
+      });
+      </script>
+      <input class="btn" style="margin-top: 30px;
+                                margin-left: 150px;
+                                margin-bottom: 30px;" type="submit" value="Create Deal">
+      <script>
+      $("#deal-desc").characterCounter({
+      limit: 110, // characters limit
+      counterSelector: false, // allow one or more counters to be specified by a jQuery selector
+      counterWrapper: 'span', // the element you wish to wrap your counter in.
+      counterCssClass: 'help-block', // the CSS class to apply to your counter.
+      counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
+      counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
+      onExceed: function(count) {alert("Character Count Exceeded")}
+      }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
+      $("#deal-name").characterCounter({
+      limit: 40, // characters limit
+      counterSelector: false, // allow one or more counters to be specified by a jQuery selector
+      counterWrapper: 'span', // the element you wish to wrap your counter in.
+      counterCssClass: 'help-block', // the CSS class to apply to your counter.
+      counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
+      counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
+      onExceed: function(count) {alert("Character Count Exceeded")}
+      }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
+      </script>
+      <script type="text/javascript">
+
+  var dealObj = new Deal();
+
+  $("#deal-form").on("submit", function(e){
+    e.preventDefault();
+    var deal = {};
+    deal.name = $("#deal-name").val();
+    deal.location_name = $("#bar-name").val();
+    deal.address = $("#address").val();
+    var dates = new Date($("#deal-start-date").val() + ":" + $("#deal-start-time").val());
+    var d = new Date($("#deal-end-date").val() + ":" + $("#deal-end-time").val());
+
+    deal.deal_start_date = dates;
+    deal.deal_end_date = d;
+    deal.deal_start_time = $("#deal-end-time").val();
+    deal.deal_end_time = $("#deal-end-date").val();
+
+    deal.community_name = $("#school-name").val();
+    deal.image_url = $("#image-url").val();
+    deal.deal_qty = parseInt($("#deal-qty").val());
+    if($("#special-included").val() == "Yes"){
+      deal.special_deal_included = true;
+      deal.sp_deal_name = $("#sp-deal-name").val();
+      deal.sp_deal_description = $("#sp-deal-desc").val();
+      deal.sp_deal_qty = parseInt($("#sp-deal-qty").val());
+      deal.sp_deal_start_date = $("#sp-deal-start-date").val();
+      deal.sp_deal_start_time = $("#sp-deal-start-time").val();
+      deal.sp_deal_end_date = $("#sp-deal-end-date").val();
+      deal.sp_deal_end_time = $("#sp-deal-end-time").val();
+    }
+    else{
+      deal.special_deal_included = false;
+      deal.sp_deal_name = "";
+      deal.sp_deal_description = "";
+      deal.sp_deal_qty = 0;
+      deal.sp_deal_start_date = "";
+      deal.sp_deal_start_time = "";
+      deal.sp_deal_end_date = "";
+      deal.sp_deal_end_time = "";
+    }
+    deal.description = $("#deal-desc").val();
+    deal.num_accepted = 0;
+    deal.num_declined = 0;
+    deal.num_elsewhere = 0;
+    deal.num_going_out = 0;
+    //check if date is taken
+  //   var query = new Parse.Query(Deal);
+  //   query.equalTo("deal_date", deal.deal_date);
+  //   query.equalTo("community_name", deal.community_name);
+  //   query.find({
+  //     success: function(results) {
+  //       if(results.length == 0){
+  //       }
+  //       else{
+  //         alert("Deal Date taken in this community, please choose another date");
+  //       }
+  //       },
+  //     error: function(error) {
+  //       alert("Error: " + error.code + " " + error.message);
+  //     }
+  //   });
+  // });
+
+          dealObj.save(deal,{
+            success: function(object) {
+              console.log("Saved to parse.");
+              console.dir(object);
+              window.location = "http://barliftweb.parseapp.com/viewDeal";
+            },
+            error: function(model, error) {
+              console.log("Error!");
+              console.dir(error);
+            }
+          });
+        });
+
+      </script>
+    </form>
+  </div>
+  </body>
+</html>

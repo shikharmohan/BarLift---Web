@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/parse/1.2.9/parse.min.js"></script>
+
+    <title>BarLift View All Deals</title>
+    <style>
+    table {
+      border: 1px solid #666;   
+        width: 75%;
+        margin:20px;
+    }
+    th {
+      background: #f8f8f8; 
+      font-weight: bold;    
+        padding: 2px;
+    }
+    table{
+    border-collapse:collapse;
+    border:1px solid #FF0000;
+    }
+    td, th {
+    padding: 20px;
+    }
+
+    table td{
+    border:1px solid #FF0000;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>View Deals</h1>
+    <a href="/">Add more deals!</a>
+    <table id="dealTable">
+    <tr>
+        <th>ID</th>
+        <th>Deal Name</th>
+        <th>Location Name</th>
+        <th>Address</th>
+        <th>Community Name</th>
+        <th>Deal Date</th>
+        <th>Deal Description</th>
+        <th>Deal Qty</th>	
+        <th>Image URL</th>
+        <th>Special Deal Included</th>
+        <th>Special Deal Name</th>
+        <th>Special Deal Description</th>
+        <th>Special Deal Qty</th>
+    </tr>
+</table>
+<script>
+var data = <%-message %>;
+drawTable(data);
+function drawTable(data) {
+    for (var i = 0; i < data.length; i++) {
+        drawRow(data[i], i);
+    }
+}
+
+function drawRow(rowData, i) {
+    var row = $("<tr />")
+    $("#dealTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
+    row.append($("<td>" + i + "</td>"));
+    row.append($("<td>" + rowData.name + "</td>"));
+    row.append($("<td>" + rowData.location_name + "</td>"));
+    row.append($("<td>" + rowData.address + "</td>"));
+    row.append($("<td>" + rowData.community_name + "</td>"));
+    row.append($("<td>" + rowData.deal_date + "</td>"));
+    row.append($("<td>" + rowData.description + "</td>"));
+    row.append($("<td>" + rowData.deal_qty + "</td>"));
+    row.append($("<td>" + rowData.image_url + "</td>"));
+    row.append($("<td>" + rowData.special_deal_included + "</td>"));
+    row.append($("<td>" + rowData.sp_deal_name + "</td>"));
+    row.append($("<td>" + rowData.sp_deal_description + "</td>"));
+    row.append($("<td>" + rowData.sp_deal_qty + "</td>"));
+}
+
+</script>
+  </body>
+</html>
