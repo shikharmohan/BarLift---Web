@@ -12,7 +12,7 @@
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/parse/1.2.9/parse.min.js"></script>
-  <script type="text/javascript">
+  <script type="text/javascript" src="">
   /**
   * Character Counter v1.0
   * ======================
@@ -216,7 +216,7 @@
       </script>
       <label for="deal-desc">Deal Description</label>
       <textarea rows="3" class="form-control" id="deal-desc" placeholder="Enter Deal Description"></textarea>
-      <label for="deal-desc">Special Deal Included</label>
+<!--       <label for="deal-desc">Special Deal Included</label>
       <select  class="form-control" id="special-included">
       <option class="form-control" value="No" >No</option>
       <option class="form-control" value="Yes">Yes</option>
@@ -225,26 +225,18 @@
       <input  type="text" class="form-control" id="sp-deal-name" placeholder="Enter Special Deal Name">
       <label class="label-special-deal" for="sp-deal-desc">Special Deal Description</label>
       <textarea rows="3" class="form-control" id="sp-deal-desc" placeholder="Enter Special Deal Description"></textarea>
-      <label for="deal-date">Special Deal Start Date</label>
-      <input type="date" class="form-control" id="sp-deal-start-date">
-      <label for="deal-date">Special Deal Start Time</label>
-      <input type="time" class="form-control" id="sp-deal-start-time">
-      <label for="deal-date">Special Deal End Date</label>
-      <input type="date" class="form-control" id="sp-deal-end-date">
-      <label for="deal-date">Special Deal End Time</label>
-      <input type="time" class="form-control" id="sp-deal-end-time">
       <label class="label-special-deal" for="sp-deal-qty">Special Deal Qty</label>
-      <input  type="text" class="form-control" id="sp-deal-qty" placeholder="Enter Special Deal Quantity (1-15)">
+      <input  type="text" class="form-control" id="sp-deal-qty" placeholder="Enter Special Deal Quantity (1-15)"> -->
       <script>
-      $("#sp-deal-name").characterCounter({
-      limit: 40, // characters limit
-      counterSelector: false, // allow one or more counters to be specified by a jQuery selector
-      counterWrapper: 'span', // the element you wish to wrap your counter in.
-      counterCssClass: 'sp-help-block', // the CSS class to apply to your counter.
-      counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
-      counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
-      onExceed: function(count) {alert("Character Count Exceeded")}
-      }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
+      // $("#sp-deal-name").characterCounter({
+      // limit: 40, // characters limit
+      // counterSelector: false, // allow one or more counters to be specified by a jQuery selector
+      // counterWrapper: 'span', // the element you wish to wrap your counter in.
+      // counterCssClass: 'sp-help-block', // the CSS class to apply to your counter.
+      // counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
+      // counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
+      // onExceed: function(count) {alert("Character Count Exceeded")}
+      // }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
       $("#bar-name").characterCounter({
       limit: 40, // characters limit
       counterSelector: false, // allow one or more counters to be specified by a jQuery selector
@@ -255,39 +247,35 @@
       onExceed: function(count) {alert("Character Count Exceeded")}
       }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
 
-      $("#sp-deal-desc").characterCounter({
-      limit: 110, // characters limit
-      counterSelector: false, // allow one or more counters to be specified by a jQuery selector
-      counterWrapper: 'span', // the element you wish to wrap your counter in.
-      counterCssClass: 'sp-help-block', // the CSS class to apply to your counter.
-      counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
-      counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
-      onExceed: function(count) {alert("Character Count Exceeded")}
-      }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
-      $("#sp-deal-name").hide();
-      $("#sp-deal-desc").hide();
-      $("#sp-deal-qty").hide();
-      $(".label-special-deal").hide();
-      $(".sp-help-block").hide();
-      $("#sp-deal-start-date").hide();
-      $("#sp-deal-end-date").hide();
-      $("#sp-deal-start-time").hide();
-      $("#sp-deal-end-time").hide();   
-      $("#special-included").on('change', function(){
-        if($("#special-included").val() == "Yes"){
-          $("#sp-deal-name").show();
-          $("#sp-deal-desc").show();
-          $("#sp-deal-qty").show();
-          $(".sp-help-block").show();
-          $(".label-special-deal").show();
+      // $("#sp-deal-desc").characterCounter({
+      // limit: 110, // characters limit
+      // counterSelector: false, // allow one or more counters to be specified by a jQuery selector
+      // counterWrapper: 'span', // the element you wish to wrap your counter in.
+      // counterCssClass: 'sp-help-block', // the CSS class to apply to your counter.
+      // counterFormat: 'Characters Remaining: %1', // the format of your counter text where '%1' will be replaced with the remaining character count.
+      // counterExceededCssClass: 'exceeded', // the CSS class to apply when your limit has been exceeded.
+      // onExceed: function(count) {alert("Character Count Exceeded")}
+      // }); // key value pairs of custom options to be added to the counter such as class, data attributes etc.
+      // $("#sp-deal-name").hide();
+      // $("#sp-deal-desc").hide();
+      // $("#sp-deal-qty").hide();
+      // $(".label-special-deal").hide();
+      // $(".sp-help-block").hide(); 
+      // $("#special-included").on('change', function(){
+      //   if($("#special-included").val() == "Yes"){
+      //     $("#sp-deal-name").show();
+      //     $("#sp-deal-desc").show();
+      //     $("#sp-deal-qty").show();
+      //     $(".sp-help-block").show();
+      //     $(".label-special-deal").show();
 
-        }
-        else if($("#special-included").val() == "No"){
-          $("#sp-deal-name").hide();
-          $("#sp-deal-desc").hide();
-          $("#sp-deal-qty").hide();
-        }
-      });
+      //   }
+      //   else if($("#special-included").val() == "No"){
+      //     $("#sp-deal-name").hide();
+      //     $("#sp-deal-desc").hide();
+      //     $("#sp-deal-qty").hide();
+      //   }
+      // });
       </script>
       <input class="btn" style="margin-top: 30px;
                                 margin-left: 150px;
@@ -333,26 +321,18 @@
     deal.community_name = $("#school-name").val();
     deal.image_url = $("#image-url").val();
     deal.deal_qty = parseInt($("#deal-qty").val());
-    if($("#special-included").val() == "Yes"){
-      deal.special_deal_included = true;
-      deal.sp_deal_name = $("#sp-deal-name").val();
-      deal.sp_deal_description = $("#sp-deal-desc").val();
-      deal.sp_deal_qty = parseInt($("#sp-deal-qty").val());
-      deal.sp_deal_start_date = $("#sp-deal-start-date").val();
-      deal.sp_deal_start_time = $("#sp-deal-start-time").val();
-      deal.sp_deal_end_date = $("#sp-deal-end-date").val();
-      deal.sp_deal_end_time = $("#sp-deal-end-time").val();
-    }
-    else{
-      deal.special_deal_included = false;
-      deal.sp_deal_name = "";
-      deal.sp_deal_description = "";
-      deal.sp_deal_qty = 0;
-      deal.sp_deal_start_date = "";
-      deal.sp_deal_start_time = "";
-      deal.sp_deal_end_date = "";
-      deal.sp_deal_end_time = "";
-    }
+    // if($("#special-included").val() == "Yes"){
+    //   deal.special_deal_included = true;
+    //   deal.sp_deal_name = $("#sp-deal-name").val();
+    //   deal.sp_deal_description = $("#sp-deal-desc").val();
+    //   deal.sp_deal_qty = parseInt($("#sp-deal-qty").val());
+    // }
+    // else{
+    //   deal.special_deal_included = false;
+    //   deal.sp_deal_name = "";
+    //   deal.sp_deal_description = "";
+    //   deal.sp_deal_qty = 0;
+    // }
     deal.description = $("#deal-desc").val();
     deal.num_accepted = 0;
     deal.num_declined = 0;
