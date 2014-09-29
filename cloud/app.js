@@ -18,6 +18,12 @@ app.get('/viewDeal', function(req, res) {
   query.find({
   success: function(results) {
   	res.render('viewDeal', { message: JSON.stringify(results) });
+  	Parse.cloud.run('sendPush', {obj: results[i]}, {
+
+
+  	});
+
+
   },
   error: function(error) {
   	console.log("err cold not retrive objects " + error);
