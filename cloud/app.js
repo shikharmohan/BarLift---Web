@@ -10,6 +10,7 @@ app.use(express.bodyParser());    // Middleware for reading request body
 
 // This is an example of hooking up a request handler with a specific request
 // path and HTTP verb using the Express routing API.
+
 app.get('/viewDeal', function(req, res) {
 
   var Deal = Parse.Object.extend("Deal");
@@ -22,8 +23,6 @@ app.get('/viewDeal', function(req, res) {
 
 
   	});
-
-
   },
   error: function(error) {
   	console.log("err cold not retrive objects " + error);
