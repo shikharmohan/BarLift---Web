@@ -1,0 +1,64 @@
+<html>
+  <head>
+  <!-- Latest compiled and minified CSS -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+  <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/parse/1.2.9/parse.min.js"></script>
+
+<script>
+  Parse.initialize("5DZi1FrdZcwBKXIxMplWsqYu3cEEumlmFDB1kKnC","G7yhVdBRY3S2jvjkHKddlsES5YZu1z99Nh9JPLTN")
+  var Deal = Parse.Object.extend("Deal");
+</script>
+    <title>BarLift - Drink Spontaneously</title>
+    <div class="main">
+      <table id="table">
+      </table>
+
+    </div>
+<script>
+Parse.Cloud.run('getUsers', {}, {
+  success: function(result) {
+    // result is 'Hello world!'
+    console.log(JSON.stringify(result));
+    for(var i = 0; i < result.length; i++){
+      $("#table").append($('<tr>')
+      .append($('<td>')
+          .append($('<p>')
+              .text(result[i]['name'])
+          )
+      )
+      .append($('<td>')
+          .append($('<p>')
+              .text('# Friends: ' + result[i]['friends'])
+          )
+      )
+      .append($('<td>')
+          .append($('<p>')
+              .css("margin-left", 30)
+              .text('DM Team: ' + result[i]['team'])
+          )
+      )
+        .append($('<td>')
+            .append($('<img>')
+                .css("height", 200)
+                .css("width", 200)
+                .attr('src', 'https://graph.facebook.com/' + result[i]['fb_id']+'/picture?type=large&return_ssl_resources=1')
+            )
+        )
+    );
+    }
+  },
+  error: function(error) {
+  }
+});
+
+</script>
+  </body>
+</html>
