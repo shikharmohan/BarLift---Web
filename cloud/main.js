@@ -391,9 +391,58 @@ Parse.Cloud.define("getFriends", function(request, response){
         error: function(object, error){
             response.error("Can't get deal");
         }
-  
-  
     });
-  
-  
 });
+
+Parse.Cloud.job("studentGroup", function(request, status) {
+  // Set up to modify user data
+  Parse.Cloud.useMasterKey();
+  // Query for all users
+  var query = new Parse.Query(Parse.User);
+  query.each(function(user) {
+      // Set and save the changes 
+      team = user.get("dm_team");
+      profile = user.get('profile');
+      if(profile != undefined){
+        gender = profile["gender"];
+      }
+      else{
+        gender = "";
+      }
+      result = [];
+      if(team == 'Choose a team...'){
+        result = [];
+      }
+      else if(team == ''){
+        result = [];
+      }
+      else if(team == undefined){
+        result = [];
+      }
+      else{
+        if(team.indexOf("/") > -1){
+            s = team.split("/");
+            if(gender == "male"){
+                result.push(s[0]);
+            }
+            else if(gender == "female"){
+                result.push(s[1]);
+            }
+        }
+        else{
+            result.push(team);
+        }
+      }
+      user.set("student_groups", result);
+     user.save();
+    status.success("success");
+  }).then(function() {
+    // Set the job's success status
+  }, function(error) {
+    // Set the job's error status
+    status.error("Uh oh, something went wrong.");
+
+  });
+});
+
+
