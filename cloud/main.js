@@ -75,6 +75,27 @@ Parse.Cloud.define("getCurrentDeal", function(request, response){
     });
 });
   
+Parse.Cloud.define("getDeals", function(request, response){
+    var query = new Parse.Query("Deal");
+    query.equalTo("community_name", request.params.location);
+    query.lessThan("createdAt", request.params.date);
+    query.include('user');
+    query.include('social');
+    query.first({
+        success: function(object) {
+          // Successfully retrieved the object.
+          if (object) {
+            response.success(object);
+          } else {
+            response.error("No object found");
+          }
+        },
+        error: function(error) {
+            response.error("Query failed.");
+        }
+      });
+});
+  
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
   if(request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10){
     response.success();
@@ -144,7 +165,7 @@ Parse.Cloud.define("newNudge", function(request, response){
     var profile = request.user.get("profile");
     console.log(profile);
     var first = profile['first_name'];
-    var string = "Nudge! " + first + " wants to see you at La Macchina tonight."
+    var string = "Nudge! " + first + " wants to see you at La Macchina tomorrow for brunch."
     var currentDeal;
     var loc = "Northwestern";
     Parse.Cloud.run('getCurrentDeal', { 'location': loc }, {
@@ -229,7 +250,7 @@ Parse.Cloud.define("nudge", function(request, response){
     var profile = request.user.get("profile");
     console.log(profile);
     var first = profile['first_name'];
-    var string = "Nudge! " + first + " wants to see you at La Macchina tonight."
+    var string = "Nudge! " + first + " wants to see you at La Macchina tomorrow for brunch."
     if(request.user.get("nudges_left") > 0){
     Parse.Push.send({ 
       where: query,
