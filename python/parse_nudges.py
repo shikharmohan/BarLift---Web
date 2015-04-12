@@ -3,21 +3,22 @@ import re
 from bs4 import BeautifulSoup
 from pprint import pprint
 
-# s = requests.Session()
-#
-# response = s.get("https://parse.com")
-# doc = lxml.html.fromstring(response.content)
-# csrf = doc.cssselect("meta[name=csrf-token]")[0].get('content')
-#
-# data = {
-# 	"authenticity_token": csrf,
-# 	"user_session[email]": "barliftapp@gmail.com",
-# 	"user_session[password]": "TurnUp2Nite!"
-# }
-#
-# x = s.post("https://parse.com/user_session", data=data)
-#
-# pickle.dump(s, open('parse_session.pickle', 'wb'))
+def store_new_session():
+    s = requests.Session()
+
+    response = s.get("https://parse.com")
+    doc = lxml.html.fromstring(response.content)
+    csrf = doc.cssselect("meta[name=csrf-token]")[0].get('content')
+
+    data = {
+        "authenticity_token": csrf,
+        "user_session[email]": "barliftapp@gmail.com",
+        "user_session[password]": "TurnUp2Nite!"
+    }
+
+    x = s.post("https://parse.com/user_session", data=data)
+
+    pickle.dump(s, open('parse_session.pickle', 'wb'))
 
 def find_tags(html, tag_name, class_name=False):
    soup = BeautifulSoup(html)
@@ -49,10 +50,12 @@ def get_all_nudges(num_pages):
     d = {}
     for i in range(1, num_pages):
         d = get_nudges(i, session, d)
-    pickle.dump(d, open('nudges_data.pickle', 'wb'))
+    pickle.dump(d, open('../nudges/nudges_data.pickle', 'wb'))
     return d
 
-d = get_all_nudges(160)
+#get_nudges(1, pickle.load(open('parse_session.pickle', 'rb')), {})
+
+d = get_all_nudges(24)
 #d = pickle.load(open('nudges_data.pickle', 'rb'))
 nudges_data = [(date, nudges) for date, nudges in sorted(d.items(), key=lambda p: p[0], reverse=True)]
 pprint(nudges_data)
