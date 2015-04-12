@@ -2,6 +2,10 @@ require('cloud/app.js');
 // Use Parse.Cloud.define to define as many cloud functions as you want.
 // For example:
 var _ = require("underscore");
+var Mailgun = require("mailgun");
+Mailgun.initialize("sandbox6d7935d6b6fa46cb830bde2511060cc8.mailgun.org", "key-6bc3fad9806ac814453c3dcb3704dd99");
+
+
 Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world!");
 });
@@ -445,4 +449,20 @@ Parse.Cloud.job("studentGroup", function(request, status) {
   });
 });
 
-
+Parse.Cloud.define("sendNewsletter", function(request, response) {
+    Mailgun.sendEmail({
+        to: "divir94@gmail.com",
+        from: "Excited User <mailgun@sandbox6d7935d6b6fa46cb830bde2511060cc8.mailgun.org>",
+        subject: "Hello from Cloud Code!",
+        text: "Using Parse and Mailgun is great!"
+    }, {
+        success: function(httpResponse) {
+            console.log(httpResponse);
+            response.success("Email sent!");
+        },
+        error: function(httpResponse) {
+            console.error(httpResponse);
+            response.error(httpResponse);
+        }
+    });
+});
