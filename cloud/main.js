@@ -472,7 +472,7 @@ Parse.Cloud.job("studentGroup", function(request, status) {
 
 Parse.Cloud.define("sendNewsletter", function(request, response) {
     Mailgun.sendEmail({
-        to: "divir94@gmail.com",
+        to: request.params.to,
         from: "BarLift <mailgun@sandbox6d7935d6b6fa46cb830bde2511060cc8.mailgun.org>",
         subject: request.params.subject,
         text: request.params.text
