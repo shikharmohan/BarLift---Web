@@ -3,6 +3,7 @@
 var express = require('express');
 var app = express();
 var fs = require('fs');
+
 // Global app configuration section
 app.set('views', 'cloud/views');  // Specify the folder to find templates
 app.set('view engine', 'ejs');    // Set the template engine
@@ -16,22 +17,19 @@ app.get('/viewDeal', function(req, res) {
   var Deal = Parse.Object.extend("Deal");
   var query = new Parse.Query(Deal);
   query.descending('createdAt');
+
   query.find({
   success: function(results) {
-  	res.render('viewDeal', { message: JSON.stringify(results) });
-  	Parse.cloud.run('sendPush', {obj: results[i]}, {
-
-
-  	});
-  },
-  error: function(error) {
-  	console.log("err cold not retrive objects " + error);
-  }
-
-  // See http://www.yelp.com/developers/documentation/v2/business
+    	res.render('viewDeal', { message: JSON.stringify(results) });
+    	Parse.cloud.run('sendPush', {obj: results[i]}, {
+    	});
+    },
+    error: function(error) {
+    	console.log("err cold not retrive objects " + error);
+    }
 	});
-});
 
+});
 
 // // Example reading from the request query string of an HTTP get request.
 // app.get('/test', function(req, res) {
