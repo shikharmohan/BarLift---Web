@@ -47,7 +47,7 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 
   // time var
   var current_time = moment().valueOf();
-  var all_recipients = "Divir Gupta <divir94@gmail.com>, Oskar Melking <oskarmelking2015@u.northwestern.edu>, Mats Gabriel Love Johansen <matsjohansen2015@u.northwestern.edu>, Shikhar Mohan <shikhar@u.northwestern.edu>, Zak Allen <ZacharyAllen2016@u.northwestern.edu>, Nikhil Pai <nikhilpai2016@u.northwestern.edu>"
+  var all_recipients = "divir94@gmail.com, oskarmelking2015@u.northwestern.edu, matsjohansen2015@u.northwestern.edu, shikhar@u.northwestern.edu, ZacharyAllen2016@u.northwestern.edu, nikhilpai2016@u.northwestern.edu, Dominicwong2014@gmail.com"
   var test_recipients = "Divir Gupta <divir94@gmail.com>"
 
   deal_query.each(function(deal) {
@@ -61,7 +61,7 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 
       	// send message
       	Parse.Cloud.run('sendEmail', { 
-      		to: "Divir Gupta <divir94@gmail.com>, Oskar Melking <oskarmelking2015@u.northwestern.edu>, Mats Gabriel Love Johansen <matsjohansen2015@u.northwestern.edu>, Shikhar Mohan <shikhar@u.northwestern.edu>, Zak Allen <ZacharyAllen2016@u.northwestern.edu>, Nikhil Pai <nikhilpai2016@u.northwestern.edu>",
+      		to: "divir94@gmail.com, oskarmelking2015@u.northwestern.edu, matsjohansen2015@u.northwestern.edu, shikhar@u.northwestern.edu, ZacharyAllen2016@u.northwestern.edu, nikhilpai2016@u.northwestern.edu",
       		subject: "Hello from BarLift!",
       		text: "Hey " + bar_name + ",\n\nYou recently ran a deal with BarLift. It was titled '" + deal.get("name") + "'. We sent the deal to 768 students and " + deal.get("num_accepted") + " students accepted it. That's great news!\n\n Stay tuned for more information!\n\n Cheers,\nBarLift Team"
       	}, 
@@ -75,8 +75,8 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 		});
 
 		// update email sent for deal 
-		//deal.set("email_sent", true);
-      	//deal.save();
+		deal.set("email_sent", true);
+      	deal.save();
       } 
       return;
   }).then(function() {
