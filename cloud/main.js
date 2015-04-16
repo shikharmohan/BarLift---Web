@@ -1,9 +1,6 @@
 require('cloud/app.js');
+require('cloud/newsletter.js');
 require("underscore");
-
-// mailgun - sending emails
-var Mailgun = require("mailgun");
-Mailgun.initialize("sandbox6d7935d6b6fa46cb830bde2511060cc8.mailgun.org", "key-6bc3fad9806ac814453c3dcb3704dd99");
 
 Parse.Cloud.define("hello", function(request, response) {
     response.success("Hello world!");
@@ -442,26 +439,6 @@ Parse.Cloud.job("studentGroup", function(request, status) {   // Set up to mod
     }).then(function() {     // Set the job's success status
           }, function(error) {     // Set the job's error status
             
-        status.error("Uh oh, something went wrong.");
-
-          
-    });
-});
-
-Parse.Cloud.define("sendNewsletter", function(request, response) {
-    Mailgun.sendEmail({
-        to: request.params.to,
-        from: "BarLift <mailgun@sandbox6d7935d6b6fa46cb830bde2511060cc8.mailgun.org>",
-        subject: request.params.subject,
-        text: request.params.text
-    }, {
-        success: function(httpResponse) {
-            console.log(httpResponse);
-            response.success("Email sent!");
-        },
-        error: function(httpResponse) {
-            console.error(httpResponse);
-            response.error(httpResponse);
-        }
+        status.error("Uh oh, something went wrong.");          
     });
 });
