@@ -586,7 +586,7 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
         var interestedCount = 0;
         var nightsOut = [0,0,0,0,0,0,0,0];
         var avgDealsRedeemed = 0;
-        _.each(data, function(user) {
+        each(data, function(user) {
             if (user.profile.gender == 'female'){
                 gender.female += 1;
             } else {
