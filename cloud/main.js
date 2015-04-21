@@ -569,8 +569,8 @@ Parse.Cloud.define("dealAnalytics", function(request, status) {   // Set up to
     var query = new Parse.Query(Parse.User);  
     var Deal = Parse.Object.extend("Deal");
     var deal = new Deal();
-    deal.id = request.params.dealID;
-    query.equalTo("social", dealId);
+    deal.id = request.params.dealId;
+    query.equalTo("social", deal);
         
     query.find({
       success: function(results) {
