@@ -559,72 +559,54 @@ Parse.Cloud.define("resetBadges", function(request, response) {
 
 
     });
-
-
-
 });
 
 
-// Scoring
-Parse.Cloud.define("getScores", function(request, response) {
-    Parse.Cloud.useMasterKey();
-    var query = new Parse.Query("User");
-    score = {};  
-    query.each(function(user) {       // Set and save the change
-        var team = user.get('dm_team');
-        if (score[team] != undefined) {
-            score[team] += 1;
-        } else {
-            score[team] = 1;
-        }  
-    }).then(function() {     // Set the job's success status
-        response.success(score);  
-    }, function(error) {     // Set the job's error status
-            
-        status.error("Uh oh, something went wrong.");  
-    });
-});
-
-// Data filtering
-Parse.Cloud.job("studentGroup", function(request, status) {   // Set up to modify user data
+Parse.Cloud.define("dealAnalytics", function(request, status) {   // Set up to modify user data
       
     Parse.Cloud.useMasterKey();   // Query for all users
-      
+
     var query = new Parse.Query(Parse.User);  
-    query.each(function(user) {       // Set and save the changes 
-              
-        team = user.get("dm_team");
-        profile = user.get('profile');
-        if (profile != undefined) {
-            gender = profile["gender"];
-        } else {
-            gender = "";
-        }
-        result = [];
-        if (team == 'Choose a team...') {
-            result = [];
-        } else if (team == '') {
-            result = [];
-        } else if (team == undefined) {
-            result = [];
-        } else {
-            if (team.indexOf("/") > -1) {
-                s = team.split("/");
-                if (gender == "male") {
-                    result.push(s[0]);
-                } else if (gender == "female") {
-                    result.push(s[1]);
-                }
-            } else {
-                result.push(team);
-            }
-        }
-        user.set("student_groups", result);
-        user.save();
-        status.success("success");  
-    }).then(function() {     // Set the job's success status
-          }, function(error) {     // Set the job's error status
-            
-        status.error("Uh oh, something went wrong.");          
+    var Deal = Parse.Object.extend("Deal");
+    var deal = new Deal();
+    deal.id = request.params.dealID;
+    query.equalTo("social", dealId);
+        
+    query.find({
+      success: function(results) {
+        response.success(processData(results));
+      },
+      error: function(error) {
+        response.error("Error: " + error.code + " " + error.message);
+      }
     });
+
+    function processData(data){
+        var gender = {male: 0, female: 0};
+        var interestedCount = 0;
+        var nightsOut = [0,0,0,0,0,0,0,0];
+        var avgDealsRedeemed = 0;
+        _.each(data, function(user) {
+            if (user.profile.gender == 'female'){
+                gender.female += 1;
+            } else {
+                gender.male += 1;
+            }
+            interestedCount += 1;
+            if (user.num_nights && user.num_nights != 'Choose a number...'){
+                nightsOut[parseInt(user.num_nights)] += 1;
+            }
+            if (user.deals_redeemed){
+                avgDealsRedeemed += parseInt(user.deals_redeemed);
+            }
+        });
+        avgDealsRedeemed = avgDealsRedeemed / interestedCount;
+
+        return {
+            gender: gender,
+            interestedCount: interestedCount,
+            nightsOut: nightsOut,
+            avgDealsRedeemed: avgDealsRedeemed
+        };
+    }
 });
