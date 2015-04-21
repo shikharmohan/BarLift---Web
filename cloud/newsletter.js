@@ -61,9 +61,9 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 
             // send message
             Parse.Cloud.run('sendEmail', {
-                to: "divir94@gmail.com, oskarmelking2015@u.northwestern.edu, matsjohansen2015@u.northwestern.edu, shikhar@u.northwestern.edu, ZacharyAllen2016@u.northwestern.edu, nikhilpai2016@u.northwestern.edu, Dominicwong2014@gmail.com",
+                to: "divir94@gmail.com",
                 subject: "Hello from BarLift!",
-                text: "Hey " + bar_name + ",\n\nYou recently ran a deal with BarLift. It was titled '" + deal.get("name") + "'. We sent the deal to 768 students and " + deal.get("num_accepted") + " students accepted it. That's great news!\n\n Stay tuned for more information!\n\n Cheers,\nBarLift Team"
+                text: "Hey " + bar_name + ",\n\nYou recently ran a deal with BarLift. It was titled '" + deal.get("name") + "'. We sent the deal to 768 students and " + deal.get("num_accepted") + " students accepted it. That's great news!\n\n Please fill out this form to help us improve - http://www.barliftapp.com/#/bar_feedback/" + deal.get("objectId") + "\n\n Cheers,\nBarLift Team"
             }, {
                 success: function() {
                     console.log("email sent for deal");

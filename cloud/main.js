@@ -220,7 +220,7 @@ Parse.Cloud.define("nudge", function(request, response) {
     var profile = request.user.get("profile");
     console.log(profile);
     var first = profile['first_name'];
-    var string = "Nudge! " + first + " wants to see you at Praire Moon tonight!"
+    var string = "Nudge! " + first + " wants to see you at La Macchina!"
     if (request.user.get("nudges_left") > 0) {
         Parse.Push.send({
             where: query,
