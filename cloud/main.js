@@ -1,6 +1,6 @@
 require('cloud/app.js');
 require('cloud/newsletter.js');
-require("underscore");
+var _ = require('underscore');
 
 Parse.Cloud.define("hello", function(request, response) {
     response.success("Hello world!");
@@ -586,7 +586,7 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
         var interestedCount = 0;
         var nightsOut = [0,0,0,0,0,0,0,0];
         var avgDealsRedeemed = 0;
-        each(data, function(user) {
+        _.each(data, function(user) {
             if (user.profile.gender == 'female'){
                 gender.female += 1;
             } else {
