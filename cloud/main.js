@@ -562,7 +562,7 @@ Parse.Cloud.define("resetBadges", function(request, response) {
 });
 
 
-Parse.Cloud.define("dealAnalytics", function(request, status) {   // Set up to modify user data
+Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up to modify user data
       
     Parse.Cloud.useMasterKey();   // Query for all users
 
