@@ -1,15 +1,21 @@
 var moment = require("moment"); // current time
 var mailgun = require("mailgun"); // sending emails
+var _ = require('underscore');  // email templating
+var fs = require('fs');
 
 // initialze mailgun with domain and API key
 mailgun.initialize("sandbox6d7935d6b6fa46cb830bde2511060cc8.mailgun.org", "key-6bc3fad9806ac814453c3dcb3704dd99");
+
+// compile template
+var template = fs.readFileSync("cloud/views/deal_email.js","utf8");
+var compiled = _.template(template);
 
 Parse.Cloud.define("sendEmail", function(request, response) {
     mailgun.sendEmail({
         to: request.params.to,
         from: "BarLift <mailgun@sandbox6d7935d6b6fa46cb830bde2511060cc8.mailgun.org>",
         subject: request.params.subject,
-        text: request.params.text
+        html: request.params.html
     }, {
         success: function(httpResponse) {
             response.success("Email sent!");
@@ -57,13 +63,21 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 
         // send email if deal ended and email not already sent
         if (current_time > end_time && email_sent === undefined) {
-            var bar_name = deal.get("user").get("bar_name");
+            // fill in template
+            var html = compiled(
+                {
+                   "bar_name": deal.get("user").get("bar_name"),
+                   "deal_name": deal.get("name"),
+                   "num_accepted": deal.get("num_accepted"),
+                   "deal_id": deal.id
+                }
+            );
 
             // send message
             Parse.Cloud.run('sendEmail', {
                 to: "divir94@gmail.com",
                 subject: "Hello from BarLift!",
-                text: "Hey " + bar_name + ",\n\nYou recently ran a deal with BarLift. It was titled '" + deal.get("name") + "'. We sent the deal to 768 students and " + deal.get("num_accepted") + " students accepted it. That's great news!\n\n Please fill out this form to help us improve - http://www.barliftapp.com/#/bar_feedback/" + deal.get("objectId") + "\n\n Cheers,\nBarLift Team"
+                html: html
             }, {
                 success: function() {
                     console.log("email sent for deal");
@@ -75,7 +89,7 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 
             // update email sent for deal 
             deal.set("email_sent", true);
-            deal.save();
+            //deal.save();
         }
         return;
     }).then(function() {

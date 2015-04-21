@@ -253,13 +253,15 @@ Parse.Cloud.job("reloadNudges", function(request, status) {   // Set up to mod
     var query = new Parse.Query(Parse.User);  
     query.each(function(user) {       // Set and save the changes 
               
-        user.set("nudges_left", 30);      
-        return user.save();
-        status.success("success");  
-    }).then(function() {     // Set the job's success status
-          }, function(error) {     // Set the job's error status
-            
-        status.error("Uh oh, something went wrong.");  
+        user.set("nudges_left", 10);      
+        user.save();
+        return;
+    }).then(function() {
+        // Set the job's success status
+        status.success("Reloaded nudges!");
+    }, function(error) {
+        // Set the job's error status
+        status.error("Uh oh, something went wrong.");
     });
 });
 
