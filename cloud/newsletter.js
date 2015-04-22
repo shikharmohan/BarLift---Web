@@ -71,7 +71,6 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
                    "deal_name": deal.get("name"),
                    "deal_start_date": moment(deal.get("deal_start_date").toString()).local().format("dddd, MMMM Do YYYY"),
                    "deal_start_time": moment(deal.get("deal_start_date").toString()).local().format("ha, MMMM Do YYYY"),
-                   "num_interested": deal.get("num_accepted"),
                    "deal_url": "http://barliftdev.herokuapp.com/#/bar_feedback/" + deal.id,
                    "pushes_sent": 672
                 }
