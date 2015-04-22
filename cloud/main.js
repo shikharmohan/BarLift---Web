@@ -574,7 +574,7 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
         var query = relation.query();
         query.find({
            success : function(results) {
-                response.success(processData(results);
+                response.success(processData(results));
             },
            error : function(error) {
                 response.error("Error: " + error.code + " " + error.message);
