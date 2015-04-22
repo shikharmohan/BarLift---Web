@@ -265,6 +265,25 @@ Parse.Cloud.job("reloadNudges", function(request, status) {   // Set up to mod
     });
 });
 
+Parse.Cloud.job("splitGender", function(request, status) {   // Set up to modify user data
+      
+    Parse.Cloud.useMasterKey();   // Query for all users
+      
+    var query = new Parse.Query(Parse.User);  
+    query.each(function(user) {       // Set and save the changes 
+        var gender = user.get('profile').gender;
+        user.set("gender", gender);      
+        user.save();
+        return;
+    }).then(function() {
+        // Set the job's success status
+        status.success("Gender split!");
+    }, function(error) {
+        // Set the job's error status
+        status.error("Uh oh, something went wrong.");
+    });
+});
+
 // Social
 Parse.Cloud.define("imGoing", function(request, response) {
     Parse.Cloud.useMasterKey();
