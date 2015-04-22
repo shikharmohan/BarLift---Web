@@ -588,17 +588,17 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
         var nightsOut = [0,0,0,0,0,0,0,0];
         var avgDealsRedeemed = 0;
         _.each(data, function(user) {
-            if (user.profile && user.profile.gender == 'female'){
+            if (user.get('profile').gender == 'female'){
                 gender.female += 1;
-            } else {
+            } else if (user.get('profile') && user.get('profile').gender == 'male'){
                 gender.male += 1;
             }
             interestedCount += 1;
-            if (user.num_nights && user.num_nights != 'Choose a number...'){
-                nightsOut[parseInt(user.num_nights)] += 1;
+            if (user.get('num_nights') && uuser.get('num_nights') != 'Choose a number...'){
+                nightsOut[parseInt(user.get('num_nights'))] += 1;
             }
-            if (user.deals_redeemed){
-                avgDealsRedeemed += parseInt(user.deals_redeemed);
+            if (user.get('deals_redeemed')){
+                avgDealsRedeemed += parseInt(user.get('deals_redeemed'));
             }
         });
         avgDealsRedeemed = avgDealsRedeemed / interestedCount;
