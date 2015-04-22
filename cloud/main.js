@@ -594,7 +594,7 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
                 gender.male += 1;
             }
             interestedCount += 1;
-            if (user.get('num_nights') && uuser.get('num_nights') != 'Choose a number...'){
+            if (user.get('num_nights') && user.get('num_nights') != 'Choose a number...'){
                 nightsOut[parseInt(user.get('num_nights'))] += 1;
             }
             if (user.get('deals_redeemed')){
