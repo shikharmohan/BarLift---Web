@@ -53,13 +53,14 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 
     // time var
     var current_time = moment().valueOf();
-    var all_recipients = "divir94@gmail.com, oskarmelking2015@u.northwestern.edu, matsjohansen2015@u.northwestern.edu, shikhar@u.northwestern.edu, ZacharyAllen2016@u.northwestern.edu, nikhilpai2016@u.northwestern.edu, Dominicwong2014@gmail.com"
-    var test_recipients = "Divir Gupta <divir94@gmail.com>"
+    var all_recipients = "divir94@gmail.com, oskarmelking2015@u.northwestern.edu, matsjohansen2015@u.northwestern.edu, shikhar@u.northwestern.edu, ZacharyAllen2016@u.northwestern.edu, nikhilpai2016@u.northwestern.edu, Dominicwong2014@gmail.com";
+    var test_recipients = "Divir Gupta <divir94@gmail.com>";
 
     deal_query.each(function(deal) {
         var end_time = moment(deal.get("end_utc")).valueOf();
         var email_sent = deal.get("email_sent");
         var num_pushes;
+        //"http://barliftdev.herokuapp.com/#/bar_feedback/"
 
         // send email if deal ended and email not already sent
         if (current_time > end_time && email_sent === undefined) {
@@ -68,14 +69,16 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
                 {
                    "bar_name": deal.get("user").get("bar_name"),
                    "deal_name": deal.get("name"),
-                   "num_accepted": deal.get("num_accepted"),
-                   "deal_id": deal.id
+                   "deal_start_date": moment(deal.get("deal_start_date").toString()).local().format("dddd, MMMM Do YYYY"),
+                   "deal_start_time": moment(deal.get("deal_start_date").toString()).local().format("ha, MMMM Do YYYY"),
+                   "deal_url": "http://barliftdev.herokuapp.com/#/bar_feedback/" + deal.id,
+                   "pushes_sent": 672
                 }
             );
 
             // send message
             Parse.Cloud.run('sendEmail', {
-                to: "divir94@gmail.com",
+                to: "divir94@gmail.com, oskarmelking2015@u.northwestern.edu, matsjohansen2015@u.northwestern.edu, shikhar@u.northwestern.edu, ZacharyAllen2016@u.northwestern.edu, nikhilpai2016@u.northwestern.edu, Dominicwong2014@gmail.com, rwpadula@gmail.com",
                 subject: "Hello from BarLift!",
                 html: html
             }, {
@@ -89,7 +92,7 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 
             // update email sent for deal 
             deal.set("email_sent", true);
-            //deal.save();
+            deal.save();
         }
         return;
     }).then(function() {
