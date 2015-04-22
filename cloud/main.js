@@ -632,3 +632,34 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
         };
     }
 });
+
+Parse.Cloud.beforeSave("Push", function(request, response) {
+    Parse.Cloud.useMasterKey();
+    var today = new Date();
+    var Push = Parse.Object.extend("Push");
+    var query = new Parse.Query(Push);
+    query.equalTo("date", request.object.get('date'));
+    query.find({
+        success: function(results){
+            _.each(results, function(push){
+                if(push.get('approved')){
+                    response.error("Error: " + push.get('text') + " is approved already");
+                    return;
+                }
+            })
+            response.success("Deal scheduled");
+        },
+        error: function(error){
+            response.error("Error: " + error.code + " " + error.message);
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
