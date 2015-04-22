@@ -566,19 +566,20 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
       
     Parse.Cloud.useMasterKey();   // Query for all users
 
-    var query = new Parse.Query(Parse.User);  
+
     var Deal = Parse.Object.extend("Deal");
-    var deal = new Deal();
-    deal.id = request.params.dealId;
-    query.equalTo("social", deal);
-        
-    query.find({
-      success: function(results) {
-        response.success(results);
-      },
-      error: function(error) {
-        response.error("Error: " + error.code + " " + error.message);
-      }
+    var query = new Parse.Query(Deal);
+    query.get(request.params.dealId, function(deal) {
+        var relation = deal.relation("social");
+        var query = relation.query();
+        query.find({
+           success : function(results) {
+                response.success(results);
+            },
+           error : function(error) {
+                response.error("Error: " + error.code + " " + error.message);
+           }
+        });
     });
 
     function processData(data){
