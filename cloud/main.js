@@ -51,6 +51,8 @@ Parse.Cloud.define("getUsers", function(request, response) {  
 });
 
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
+        request.object.set("community_v2", []);
+        request.object.set("newVersion", false);
     if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
         response.success();
     } else if (request.object.get("nudges_left") < 0) {
@@ -220,7 +222,7 @@ Parse.Cloud.define("nudge", function(request, response) {
     var profile = request.user.get("profile");
     console.log(profile);
     var first = profile['first_name'];
-    var string = "Nudge! " + first + " wants to see you at La Macchina!"
+    var string = "Nudge! " + first + " wants to see you out!"
     if (request.user.get("nudges_left") > 0) {
         Parse.Push.send({
             where: query,
@@ -264,6 +266,25 @@ Parse.Cloud.job("reloadNudges", function(request, status) {   // Set up to mod
         status.error("Uh oh, something went wrong.");
     });
 });
+
+//set new columns
+Parse.Cloud.job("v2_columnUpdate", function(request, status){
+    Parse.Cloud.useMasterKey();   // Query for all users
+      
+    var query = new Parse.Query(Parse.User);  
+    query.each(function(user) {       // Set and save the changes 
+        user.set("newVersion", false);
+        user.set("community_v2", []);
+        user.save();
+        return;
+    }).then(function(){
+        status.success("Set community & version");
+    }, function(error){
+                status.error("Uh oh, something went wrong.");
+
+    })
+});
+
 
 Parse.Cloud.job("splitGender", function(request, status) {   // Set up to modify user data
       
@@ -654,10 +675,6 @@ Parse.Cloud.beforeSave("Push", function(request, response) {
         }
     });
 });
-
-
-
-
 
 
 
