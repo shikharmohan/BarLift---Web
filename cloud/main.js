@@ -51,8 +51,10 @@ Parse.Cloud.define("getUsers", function(request, response) {  
 });
 
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
-        request.object.set("community_v2", []);
-        request.object.set("newVersion", false);
+
+    request.object.set("community_v2", []);
+    request.object.set("newVersion", false);
+
     if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
         response.success();
     } else if (request.object.get("nudges_left") < 0) {
@@ -66,6 +68,23 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
         response.success();
     }
 });
+
+Parse.Cloud.afterSave(Parse.User, function(request) {
+    Parse.Cloud.useMasterKey();
+    if(request.object.get('Role') !==  undefined){
+        query = new Parse.Query(Parse.Role);
+        query.get(request.object.get('Role').id, {
+            success: function(object) {
+                console.log("role found");
+                console.log(object);
+                object.relation("users").add(request.object);
+                object.save();
+            },
+            error: function(error) {
+            }
+        });
+    }
+}); 
 
 // Deals
 Parse.Cloud.define("getCurrentDeal", function(request, response) {
@@ -222,7 +241,7 @@ Parse.Cloud.define("nudge", function(request, response) {
     var profile = request.user.get("profile");
     console.log(profile);
     var first = profile['first_name'];
-    var string = "Nudge! " + first + " wants to see you out!"
+    var string = "Nudge! " + first + " wants to see you at the Deuce!"
     if (request.user.get("nudges_left") > 0) {
         Parse.Push.send({
             where: query,
