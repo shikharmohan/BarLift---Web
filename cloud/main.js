@@ -708,32 +708,18 @@ Parse.Cloud.beforeSave("Push", function(request, response) {
     query.equalTo("date", request.object.get('date'));
     query.find({
         success: function(results){
+            var conflict = false;
             _.each(results, function(push){
                 if(push.get('approved')){
-                    response.error("Error: " + push.get('text') + " is approved already");
-                    return;
+                    conflict = true;
                 }
             })
-            response.success("Deal scheduled");
-        },
-        error: function(error){
-            response.error("Error: " + error.code + " " + error.message);
-        }
-    });
-});
 
-Parse.Cloud.define("takenPushDays", function(request, response) {
-    Parse.Cloud.useMasterKey();
-    var today = new Date();
-    var Push = Parse.Object.extend("Push");
-    var query = new Parse.Query(Push);
-    query.find({
-        success: function(results){
-            var days = [];
-            _.each(results, function(push){
-                days.push(push.get('date'));
-            })
-            response.success(days);
+            if(conflict){
+                response.error("Error: another deal is scheduled already");
+            } else {
+                response.success(request.object);
+            }
         },
         error: function(error){
             response.error("Error: " + error.code + " " + error.message);
