@@ -241,7 +241,7 @@ Parse.Cloud.define("nudge", function(request, response) {
     var profile = request.user.get("profile");
     console.log(profile);
     var first = profile['first_name'];
-    var string = "Nudge! " + first + " wants to see you at the Deuce!"
+    var string = "Nudge! " + first + " wants to see you out!"
     if (request.user.get("nudges_left") > 0) {
         Parse.Push.send({
             where: query,
@@ -558,6 +558,10 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
     console.log(last);
     var dealID = request.params.deal_objectId;
     var dealQuery = new Parse.Query("Deal");
+    var badge = 0;
+    if(user.get('newVersion')){
+        badge = "Increment";
+    }
     dealQuery.include("venue");
     dealQuery.get(dealID, {
 
