@@ -558,9 +558,9 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
     console.log(last);
     var dealID = request.params.deal_objectId;
     var dealQuery = new Parse.Query("Deal");
-    var badge = 0;
-    if(user.get('newVersion')){
-        badge = "Increment";
+    var bdg = 0;
+    if(request.user.get('newVersion')){
+        bdg = "Increment";
     }
     dealQuery.include("venue");
     dealQuery.get(dealID, {
@@ -579,7 +579,7 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
                 where: query,
                 data: {
                     alert: string,
-                    badge: "Increment"
+                    badge: bdg
                 }
             }, 
             {
