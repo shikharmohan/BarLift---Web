@@ -722,6 +722,26 @@ Parse.Cloud.beforeSave("Push", function(request, response) {
     });
 });
 
+Parse.Cloud.define("takenPushDays", function(request, response) {
+    Parse.Cloud.useMasterKey();
+    var today = new Date();
+    var Push = Parse.Object.extend("Push");
+    var query = new Parse.Query(Push);
+    query.find({
+        success: function(results){
+            var days = [];
+            _.each(results, function(push){
+                days.push(push.get('date'));
+            })
+            response.success(days);
+        },
+        error: function(error){
+            response.error("Error: " + error.code + " " + error.message);
+        }
+    });
+});
+
+
 
 
 
