@@ -371,13 +371,17 @@ Parse.Cloud.define("notGoing", function(request, response) {
     var Deal;
     deal_query.get(dealID, {
         success: function(deal) {
-            deal.increment("num_accepted", -1);
+            if(deal.get("num_accepted") > 0){
+                deal.increment("num_accepted", -1);
+            }
             deal.save();
             user_query.get(userID, {
                 success: function(user) {
                     console.log("Got user");
                     console.log(user);
-                    user.increment("deals_redeemed", -1);
+                    if(user.get("deals_redeemed") > 0){
+                        user.increment("deals_redeemed", -1);
+                    }
                     var dr = user.relation("deal_list");
                     dr.remove(deal);
                     user.save();
@@ -596,6 +600,25 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
             }); 
         }
 
+    });
+
+});
+
+//Load nudge history
+Parse.Cloud.define("getMyNudges", function(request, response){
+    Parse.Cloud.useMasterKey();
+    var fb_id = request.user.get("fb_id");
+    var query = new Parse.Query("Nudge");
+    query.include("deal");
+    query.include("from_user");
+    query.equalTo("to_fb_id", fb_id);
+    query.find({
+        success: function(objects){
+            response.success(objects);
+        },
+        error: function(error){
+            response.error(error);
+        }
     });
 
 });
