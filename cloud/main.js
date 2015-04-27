@@ -549,12 +549,11 @@ Parse.Cloud.define("getInterestedOthers", function(request, response) {
 //NudgeV2
 Parse.Cloud.define("nudge_v2", function(request, response) {
     Parse.Cloud.useMasterKey();
-    var toUser = '10153138455222223';
+    var toUser = request.params.fb;
     var query = new Parse.Query(Parse.Installation);
     query.equalTo('fb_id', toUser);
     var profile = request.user.get("profile");
     var first = profile['first_name'];
-    var last = profile['last_name'];
     console.log(last);
     var dealID = request.params.deal_objectId;
     var dealQuery = new Parse.Query("Deal");
@@ -573,7 +572,7 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
             nudge.set("to_fb_id", toUser);
             nudge.set("from_user", request.user);
             nudge.set("deal", deal);
-            
+            nudge.set("text", string);
             Parse.Push.send(
             {
                 where: query,
