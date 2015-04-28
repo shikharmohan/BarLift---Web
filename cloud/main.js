@@ -554,7 +554,6 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
     query.equalTo('fb_id', toUser);
     var profile = request.user.get("profile");
     var first = profile['first_name'];
-    console.log(last);
     var dealID = request.params.deal_objectId;
     var dealQuery = new Parse.Query("Deal");
     var bdg = 0;
@@ -572,7 +571,7 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
             nudge.set("to_fb_id", toUser);
             nudge.set("from_user", request.user);
             nudge.set("deal", deal);
-            nudge.set("text", string);
+            nudge.set("text", string)
             Parse.Push.send(
             {
                 where: query,
