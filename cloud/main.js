@@ -342,6 +342,8 @@ Parse.Cloud.define("imGoing", function(request, response) {
                     console.log("Got user");
                     console.log(user);
                     user.increment("deals_redeemed", 1);
+                    user.set("bar_visited", deal.get("venue").get("bar_name"));
+
                     var dr = user.relation("deal_list");
                     dr.add(deal);
                     user.save();
@@ -388,7 +390,6 @@ Parse.Cloud.define("notGoing", function(request, response) {
                     var relation = deal.relation("social");
                     relation.remove(user);
                     deal.save();
-                    user.set("visited_bar", deal.get("venue").get("bar_name"));
                     response.success(1);
                 },
                 error: function(object, error) {
