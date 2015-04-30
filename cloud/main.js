@@ -388,6 +388,7 @@ Parse.Cloud.define("notGoing", function(request, response) {
                     var relation = deal.relation("social");
                     relation.remove(user);
                     deal.save();
+                    user.set("visited_bar", deal.get("venue").get("bar_name"));
                     response.success(1);
                 },
                 error: function(object, error) {
@@ -450,7 +451,7 @@ Parse.Cloud.define("getFriends", function(request, response) {
 
 
 //Friends who are interested
-Parse.Cloud.define("getInterestedFriends", function(request, response) {
+Parse.Cloud.define("getWhosGoing", function(request, response) {
     Parse.Cloud.useMasterKey();
     var dealID = request.params.deal_objectId;
     console.log(dealID);
@@ -471,17 +472,30 @@ Parse.Cloud.define("getInterestedFriends", function(request, response) {
                     }
                     var query = dealGoers.query();
                     query.descending("createdAt");
-                    query.containedIn("fb_id", fb_ids);
+                    //query.containedIn("fb_id", fb_ids);
                     query.find({
                         success: function(list) {
+                            myIdx = -1;
+                            imInt = false;
                             for (var i = 0; i < list.length; i++) {
                                 var profile = list[i].get("profile");
-                                result.push([profile["name"], list[i].get("fb_id")]);
+                                fb = list[i].get("fb_id");
+                                if(fb != request.user.get("fb_id")){
+                                    result.push({"name":profile["name"], "fb_id":list[i].get("fb_id")});
+                                }
+                                else{
+                                    myIdx = i;
+                                }
+                            }
+                            if(myIdx != -1){
+                                var myProf = list[myIdx].get("profile");
+                                result.push({"name":myProf["name"], "fb_id": request.user.get("fb_id")});
+                                imInt = true;
                             }
                             var uniqueArray = result.filter(function(elem, pos) {
                                 return result.indexOf(elem) == pos;
                             });
-                            response.success(uniqueArray);
+                            response.success([uniqueArray, imInt]);
                         }
                     });
 
@@ -545,6 +559,54 @@ Parse.Cloud.define("getInterestedOthers", function(request, response) {
     });
 });
 
+
+//Others who are interested
+Parse.Cloud.define("getInterestedFriends", function(request, response) {
+    Parse.Cloud.useMasterKey();
+    var dealID = request.params.deal_objectId;
+    console.log(dealID);
+    var userID = request.params.user_objectId;
+    var deal_query = new Parse.Query("Deal");
+    var user_query = new Parse.Query("_User");
+    var fb_ids = [];
+    var result = [];
+    deal_query.get(dealID, {
+        success: function(deal) {
+            user_query.get(userID, {
+                success: function(user) {
+                    var friends = user.get("friends");
+                    var dealGoers = deal.relation("social");
+                    fb_ids.push(user.get("fb_id"));
+                    for (var i = 0; i < friends.length; i++) {
+                        fb_ids.push(friends[i]["fb_id"]);
+                    }
+                    var query = dealGoers.query();
+                    query.descending("createdAt");
+                    query.containedIn("fb_id", fb_ids);
+                    query.find({
+                        success: function(list) {
+                            for (var i = 0; i < list.length; i++) {
+                                var profile = list[i].get("profile");
+                                result.push([profile["name"], list[i].get("fb_id")]);
+                            }
+                            var uniqueArray = result.filter(function(elem, pos) {
+                                return result.indexOf(elem) == pos;
+                            });
+                            response.success(uniqueArray);
+                        }
+                    });
+
+                },
+                error: function(object, error) {
+                    response.error("Search failed, user failed.");
+                }
+            });
+        },
+        error: function(object, error) {
+            response.error("Can't get deal");
+        }
+    });
+});
 
 //NudgeV2
 Parse.Cloud.define("nudge_v2", function(request, response) {
