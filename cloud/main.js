@@ -330,6 +330,7 @@ Parse.Cloud.define("imGoing", function(request, response) {
     var dealID = request.params.deal_objectId;
     var userID = request.params.user_objectId;
     var deal_query = new Parse.Query("Deal");
+    deal_query.include("venue");
     var user_query = new Parse.Query("_User");
     var User;
     var Deal;
