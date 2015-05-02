@@ -52,8 +52,8 @@ Parse.Cloud.define("getUsers", function(request, response) {  
 
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
 
-    request.object.set("community_v2", []);
-    request.object.set("newVersion", false);
+    // request.object.set("community_v2", []);
+    // request.object.set("newVersion", false);
 
     if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
         response.success();
@@ -336,7 +336,7 @@ Parse.Cloud.define("imGoing", function(request, response) {
     var Deal;
     deal_query.get(dealID, {
         success: function(deal) {
-            deal.increment("num_accepted");
+            deal.increment("num_accepted", 1);
             deal.save();
             user_query.get(userID, {
                 success: function(user) {
@@ -374,7 +374,7 @@ Parse.Cloud.define("notGoing", function(request, response) {
     var Deal;
     deal_query.get(dealID, {
         success: function(deal) {
-            if(deal.get("num_accepted") > 0){
+            if(deal.get("num_accepted") > 1){
                 deal.increment("num_accepted", -1);
             }
             deal.save();
@@ -561,6 +561,36 @@ Parse.Cloud.define("getInterestedOthers", function(request, response) {
     });
 });
 
+Parse.Cloud.define("amIInterested", function(request, response){
+    Parse.Cloud.useMasterKey();
+    var dID = request.params.dealID;
+    var userID = request.user.get("fb_id");
+    var deal_query = new Parse.Query("Deal");
+    var user_query = new Parse.Query("_User");
+    deal_query.get(dID, {
+        success: function(deal) {
+            var social = deal.relation("social");
+            var query = social.query();
+            query.containedIn("fb_id", request.user.get("fb_id"));
+            query.find({
+                success: function(list){
+                    if(list.length == 0){
+                        response.success(false);
+                    }
+                    else{
+                        response.success(true);
+                    }
+                },
+                error: function(error){
+                    response.error(error);
+                }
+            });
+        },
+        error: function(error){
+            response.error(error);
+        }
+    });    
+});
 
 //Others who are interested
 Parse.Cloud.define("getInterestedFriends", function(request, response) {
@@ -669,6 +699,8 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
     });
 
 });
+
+
 
 //Load nudge history
 Parse.Cloud.define("getMyNudges", function(request, response){
