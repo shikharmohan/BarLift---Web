@@ -340,8 +340,8 @@ Parse.Cloud.define("imGoing", function(request, response) {
     var Deal;
     deal_query.get(dealID, {
         success: function(deal) {
-            deal.increment("num_accepted", 1);
-            deal.save();
+           // deal.increment("num_accepted", 1);
+           // deal.save();
             user_query.get(userID, {
                 success: function(user) {
                     console.log("Got user");
@@ -397,9 +397,9 @@ Parse.Cloud.define("notGoing", function(request, response) {
     var Deal;
     deal_query.get(dealID, {
         success: function(deal) {
-            if(deal.get("num_accepted") > 1){
-                deal.increment("num_accepted", -1);
-            }
+            // if(deal.get("num_accepted") > 1){
+            //     deal.increment("num_accepted", -1);
+            // }
             deal.save();
             user_query.get(userID, {
                 success: function(user) {
@@ -506,6 +506,8 @@ Parse.Cloud.define("getWhosGoing", function(request, response) {
                         success: function(list) {
                             myIdx = -1;
                             imInt = false;
+                            deal.set("num_accepted", list.length);
+                            deal.save();
                             for (var i = 0; i < list.length; i++) {
                                 var profile = list[i].get("profile");
                                 fb = list[i].get("fb_id");
@@ -670,8 +672,10 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
                 where: query,
                 data: {
                     alert: string,
-                    badge: bdg
+                    badge: bdg,
+                    dealID:deal.id
                 }
+                
             }, 
             {
                 success: function() {
