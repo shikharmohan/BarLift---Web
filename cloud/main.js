@@ -50,11 +50,12 @@ Parse.Cloud.define("getUsers", function(request, response) {  
     });
 });
 
+
+
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
 
     // request.object.set("community_v2", []);
     // request.object.set("newVersion", false);
-
     if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
         response.success();
     } else if (request.object.get("nudges_left") < 0) {
@@ -305,15 +306,18 @@ Parse.Cloud.job("v2_columnUpdate", function(request, status){
 });
 
 
+
 Parse.Cloud.job("splitGender", function(request, status) {   // Set up to modify user data
       
     Parse.Cloud.useMasterKey();   // Query for all users
       
     var query = new Parse.Query(Parse.User);  
     query.each(function(user) {       // Set and save the changes 
-        var gender = user.get('profile').gender;
-        user.set("gender", gender);      
-        user.save();
+        if(user.get('profile') != undefined){
+            var gender = user.get('profile').gender;
+            user.set("gender", gender);      
+            user.save();
+        }
         return;
     }).then(function() {
         // Set the job's success status
@@ -343,13 +347,15 @@ Parse.Cloud.define("imGoing", function(request, response) {
                     console.log("Got user");
                     console.log(user);
                     user.increment("deals_redeemed", 1);
-                    user.set("bar_visited", deal.get("venue").get("bar_name"));
-
+                    if(user.get("newVersion") != false){
+                        user.set("bar_visited", deal.get("venue").get("bar_name"));
+                    }
                     var dr = user.relation("deal_list");
                     dr.add(deal);
                     user.save();
                     var relation = deal.relation("social");
                     relation.add(user);
+                    deal.addUnique("whos_going",request.user.get("fb_id"));
                     deal.save();
                     response.success(1);
                 },
@@ -361,6 +367,23 @@ Parse.Cloud.define("imGoing", function(request, response) {
         error: function(object, error) {
             response.error("Search failed, no deal query failed.");
         }
+    });
+});
+
+Parse.Cloud.define("getNumberNudges", function(request, response){
+    Parse.Cloud.useMasterKey();
+    var dealID = request.params.dealID;
+    var query = new Parse.Query("Nudge");
+    query.equalTo("dealID", dealID);
+    query.count({
+      success: function(count) {
+        // The count request succeeded. Show the count
+        response.success(count);
+      },
+      error: function(error) {
+        response.error(error);
+      }
+
     });
 });
 
@@ -390,6 +413,7 @@ Parse.Cloud.define("notGoing", function(request, response) {
                     user.save();
                     var relation = deal.relation("social");
                     relation.remove(user);
+                    deal.remove("whos_going", request.user.get("fb_id"));
                     deal.save();
                     response.success(1);
                 },
@@ -426,6 +450,9 @@ Parse.Cloud.define("getFriends", function(request, response) {
                     var query = dealGoers.query();
                     query.descending("createdAt");
                     //query.containedIn("fb_id", fb_ids);
+                    if(request.user.get('gender')){
+
+                    }
                     query.find({
                         success: function(list) {
                             for (var i = 0; i < list.length; i++) {
@@ -473,8 +500,8 @@ Parse.Cloud.define("getWhosGoing", function(request, response) {
                         fb_ids.push(friends[i]["fb_id"]);
                     }
                     var query = dealGoers.query();
-                    query.descending("createdAt");
-                    //query.containedIn("fb_id", fb_ids);
+                    query.ascending("gender");
+                   // query.descending("createdAt");
                     query.find({
                         success: function(list) {
                             myIdx = -1;
@@ -561,36 +588,6 @@ Parse.Cloud.define("getInterestedOthers", function(request, response) {
     });
 });
 
-Parse.Cloud.define("amIInterested", function(request, response){
-    Parse.Cloud.useMasterKey();
-    var dID = request.params.dealID;
-    var userID = request.user.get("fb_id");
-    var deal_query = new Parse.Query("Deal");
-    var user_query = new Parse.Query("_User");
-    deal_query.get(dID, {
-        success: function(deal) {
-            var social = deal.relation("social");
-            var query = social.query();
-            query.containedIn("fb_id", request.user.get("fb_id"));
-            query.find({
-                success: function(list){
-                    if(list.length == 0){
-                        response.success(false);
-                    }
-                    else{
-                        response.success(true);
-                    }
-                },
-                error: function(error){
-                    response.error(error);
-                }
-            });
-        },
-        error: function(error){
-            response.error(error);
-        }
-    });    
-});
 
 //Others who are interested
 Parse.Cloud.define("getInterestedFriends", function(request, response) {
@@ -651,9 +648,10 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
     var dealID = request.params.deal_objectId;
     var dealQuery = new Parse.Query("Deal");
     var bdg = 0;
-    if(request.user.get('newVersion')){
+    if(request.user.get('newVersion') != false){
         bdg = "Increment";
     }
+    console.log(bdg);
     dealQuery.include("venue");
     dealQuery.get(dealID, {
 
@@ -665,6 +663,7 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
             nudge.set("to_fb_id", toUser);
             nudge.set("from_user", request.user);
             nudge.set("deal", deal);
+            nudge.set("dealID", deal.id);
             nudge.set("text", string)
             Parse.Push.send(
             {
@@ -710,6 +709,7 @@ Parse.Cloud.define("getMyNudges", function(request, response){
     query.include("deal");
     query.include("from_user");
     query.equalTo("to_fb_id", fb_id);
+    query.descending("createdAt");
     query.find({
         success: function(objects){
             response.success(objects);
