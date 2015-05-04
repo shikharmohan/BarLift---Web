@@ -1,5 +1,6 @@
 require('cloud/app.js');
 require('cloud/newsletter.js');
+require('cloud/dashboard.js');
 var _ = require('underscore');
 
 Parse.Cloud.define("hello", function(request, response) {

@@ -43,7 +43,17 @@ Parse.Cloud.define("pushesSent", function(request, response) {
 
 });
 
-Parse.Cloud.job("afterDealEmails", function(request, status) {
+Parse.Cloud.define("emailTest", function(request, response) {
+    // Set up to modify data
+    Parse.Cloud.useMasterKey();
+
+    // query for all deals including users
+    var deal_query = new Parse.Query("Deal");
+    deal_query.include("user");
+
+});
+
+Parse.Cloud.define("afterDealEmails", function(request, response) {
     // Set up to modify data
     Parse.Cloud.useMasterKey();
 
@@ -60,7 +70,6 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
         var end_time = moment(deal.get("end_utc")).valueOf();
         var email_sent = deal.get("email_sent");
         var num_pushes;
-        //"http://barliftdev.herokuapp.com/#/bar_feedback/"
 
         // send email if deal ended and email not already sent
         if (current_time > end_time && email_sent === undefined) {
@@ -71,14 +80,14 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
                    "deal_name": deal.get("name"),
                    "deal_start_date": moment(deal.get("deal_start_date").toString()).local().format("dddd, MMMM Do YYYY"),
                    "deal_start_time": moment(deal.get("deal_start_date").toString()).local().format("ha, MMMM Do YYYY"),
-                   "deal_url": "http://barliftdev.herokuapp.com/#/bar_feedback/" + deal.id,
+                   "deal_url": 'http://barliftdev.herokuapp.com/#/bar_feedback/' + deal.id,
                    "pushes_sent": 672
                 }
             );
 
             // send message
             Parse.Cloud.run('sendEmail', {
-                to: "divir94@gmail.com, oskarmelking2015@u.northwestern.edu, matsjohansen2015@u.northwestern.edu, shikhar@u.northwestern.edu, ZacharyAllen2016@u.northwestern.edu, nikhilpai2016@u.northwestern.edu, Dominicwong2014@gmail.com",
+                to: "divir94@gmail.com",
                 subject: "Hello from BarLift!",
                 html: html
             }, {
@@ -92,14 +101,15 @@ Parse.Cloud.job("afterDealEmails", function(request, status) {
 
             // update email sent for deal 
             deal.set("email_sent", true);
-            deal.save();
+            //deal.save();
         }
-        return;
-    }).then(function() {
+
+    }).then(function(success) {
         // Set the job's success status
-        status.success("Sent post-deal emails!");
+        response.success("success");
     }, function(error) {
         // Set the job's error status
-        status.error("Uh oh, something went wrong.");
+        response.error("Uh oh, something went wrong.");
     });
+
 });
