@@ -57,7 +57,9 @@ Parse.Cloud.define("getUsers", function(request, response) {  
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
 
     // request.object.set("community_v2", []);
-    // request.object.set("newVersion", false);
+    request.object.set("newVersion", false);
+    var name = request.object.get("profile");
+    request.object.set("full_name", name["name"]);
     if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
         response.success();
     } else if (request.object.get("nudges_left") < 0) {
@@ -349,7 +351,8 @@ Parse.Cloud.define("imGoing", function(request, response) {
                     console.log("Got user");
                     console.log(user);
                     user.increment("deals_redeemed", 1);
-                    if(user.get("newVersion") != false){
+                    var newV = user.get("newVersion");
+                    if(newV != undefined || newV != false){
                         user.set("bar_visited", deal.get("venue").get("bar_name"));
                     }
                     var dr = user.relation("deal_list");
