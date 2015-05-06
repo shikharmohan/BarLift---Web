@@ -2,6 +2,7 @@ require('cloud/app.js');
 require('cloud/newsletter.js');
 require('cloud/dashboard.js');
 var _ = require('underscore');
+var moment = require("moment");
 
 Parse.Cloud.define("hello", function(request, response) {
     response.success("Hello world!");
@@ -816,6 +817,46 @@ Parse.Cloud.beforeSave("Push", function(request, response) {
 
             if(conflict){
                 response.error("Error: another deal is scheduled already");
+            } else {
+                response.success(request.object);
+            }
+        },
+        error: function(error){
+            response.error("Error: " + error.code + " " + error.message);
+        }
+    });
+});
+
+Parse.Cloud.beforeSave("Deal", function(request, response) {
+    Parse.Cloud.useMasterKey();
+    var dayStart = moment(request.object.get('deal_start_date')).startOf('day');
+    var dayEnd = moment(request.object.get('deal_start_date')).endOf('day');
+
+    if(moment().isAfter(dayStart)){
+        response.error("Error: You can't schedule deals in the past");
+    }
+
+    if(moment().add(3, 'days').isBefore(dayStart)){
+        response.error("Error: You must schedule 3 days in advance");
+    }
+
+    var Deal = Parse.Object.extend("Deal");
+    var query = new Parse.Query(Deal);
+    query.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
+    query.lessThanOrEqualTo("deal_start_date", dayEnd.add(30, 'days').toDate());
+    query.ascending("deal_start_date");
+    query.find({
+        success: function(results){
+
+            _.each(results, function(deal){
+                if(_.isEqual(request.object.get('venue'),deal.get('venue')) && 
+                    moment(deal.get('deal_start_date')).isBetween(dayStart,dayEnd)){
+                    response.error("Error: another deal is scheduled for that day at this venue");
+                }
+            })
+
+            if(results.length > 4){
+                response.error("Error: you can oly have 4 deals in a 30 day span. You last deal is " + moment(results[results.length-1].get('deal_start_date')).format('MM/DD/YY'));
             } else {
                 response.success(request.object);
             }
