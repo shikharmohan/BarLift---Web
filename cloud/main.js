@@ -647,7 +647,7 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
     var query = new Parse.Query(Parse.Installation);
     query.equalTo('fb_id', toUser);
     var profile = request.user.get("profile");
-    var first = profile['first_name'];
+    var first = profile['name'];
     var dealID = request.params.deal_objectId;
     var dealQuery = new Parse.Query("Deal");
     var bdg = 0;
@@ -698,6 +698,9 @@ Parse.Cloud.define("nudge_v2", function(request, response) {
                     response.error(-1);
                 }
             }); 
+        },
+        error: function(error){
+            response.error(error);
         }
 
     });
