@@ -2,7 +2,7 @@ require('cloud/app.js');
 require('cloud/newsletter.js');
 require('cloud/dashboard.js');
 var _ = require('underscore');
-var moment = require("moment");
+var moment = require("cloud/moment");
 
 Parse.Cloud.define("hello", function(request, response) {
     response.success("Hello world!");
@@ -839,7 +839,7 @@ Parse.Cloud.beforeSave("Deal", function(request, response) {
         response.error("Error: You can't schedule deals in the past");
     }
 
-    if(moment().add(3, 'days').isBefore(dayStart)){
+    if(moment().add(3, 'days').isAfter(dayStart)){
         response.error("Error: You must schedule 3 days in advance");
     }
 
