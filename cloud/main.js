@@ -56,13 +56,16 @@ Parse.Cloud.define("getUsers", function(request, response) {  
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
 
     // request.object.set("community_v2", []);
-    request.object.set("newVersion", false);
+    if(request.object.get("newVersion") == undefined || request.object.get("newVersion") == false){
+        request.object.set("newVersion", false);
+    }
     var name = request.object.get("profile");
     request.object.set("full_name", name["name"]);
     if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
         response.success();
     } else if (request.object.get("nudges_left") < 0) {
         request.object.set("nudges_left", 0);
+        request.object.save();
         response.success();
     } else {
         request.object.set("times_nudged", 0);
