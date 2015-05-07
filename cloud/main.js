@@ -861,7 +861,7 @@ Parse.Cloud.beforeSave("Deal", function(request, response) {
     query.find({
         success: function(results){
             if(!err.happened){
-                if(results.length > 1){
+                if(results.length > 0){
                     err.happened = true;
                     err.message = "Error: another deal is scheduled for that day at this venue"
                 }
