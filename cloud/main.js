@@ -60,18 +60,23 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
     if(request.object.get("newVersion") == undefined || request.object.get("newVersion") == false){
         request.object.set("newVersion", false);
     }
-    var name = request.object.get("profile");
-    request.object.set("full_name", name["name"]);
-    if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
-        response.success();
-    } else if (request.object.get("nudges_left") < 0) {
-        request.object.set("nudges_left", 0);
-        request.object.save();
-        response.success();
+    if(request.object.get("profile")){
+        var name = request.object.get("profile");
+        request.object.set("full_name", name["name"]);
+        if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
+            response.success();
+        } else if (request.object.get("nudges_left") < 0) {
+            request.object.set("nudges_left", 0);
+            request.object.save();
+            response.success();
+        } else {
+            request.object.set("times_nudged", 0);
+            request.object.set("nudges_left", 10);
+            request.object.set("community_name", "Northwestern");
+            request.object.save();
+            response.success();
+        }
     } else {
-        request.object.set("times_nudged", 0);
-        request.object.set("nudges_left", 10);
-        request.object.set("community_name", "Northwestern");
         request.object.save();
         response.success();
     }
