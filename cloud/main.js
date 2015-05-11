@@ -1,6 +1,7 @@
 require('cloud/app.js');
 require('cloud/newsletter.js');
 require('cloud/dashboard.js');
+require('cloud/payments.js');
 var _ = require('underscore');
 var moment = require("cloud/moment");
 
