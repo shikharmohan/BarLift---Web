@@ -98,7 +98,7 @@ Parse.Cloud.afterSave(Parse.User, function(request) {
             error: function(error) {
             }
         });
-    }
+    } 
 }); 
 
 
@@ -278,6 +278,23 @@ Parse.Cloud.job("v2_columnUpdate", function(request, status){
     })
 });
 
+Parse.Cloud.job("addUserRoles", function(request, status){
+    Parse.Cloud.useMasterKey();   // Query for all users
+      
+    var query = new Parse.Query(Parse.User);  
+    query.each(function(user) {       // Set and save the changes 
+        if(user.get('profile')){
+            user.set("Role", {__type: "Pointer", className: "_Role", objectId: "uGBZhZM8LM"});
+            user.save();
+            return;
+        }
+    }).then(function(){
+        status.success("Set community & version");
+    }, function(error){
+        status.error("Uh oh, something went wrong.");
+
+    })
+});
 
 
 Parse.Cloud.job("splitGender", function(request, status) {   // Set up to modify user data
@@ -703,7 +720,7 @@ Parse.Cloud.define("getMyNudges", function(request, response){
 });
 
 Parse.Cloud.define("resetBadges", function(request, response) {
-        Parse.Cloud.useMasterKey();
+    Parse.Cloud.useMasterKey();
     var fb_id = request.user.get("fb_id");
     var query = new Parse.Query(Parse.Installation);
     query.equalTo('fb_id', fb_id);
@@ -724,31 +741,19 @@ Parse.Cloud.define("resetBadges", function(request, response) {
     });
 });
 
-
-Parse.Cloud.beforeSave("Push", function(request, response) {
+Parse.Cloud.define("pushCount",function(request,response){
     Parse.Cloud.useMasterKey();
-    var today = new Date();
-    var Push = Parse.Object.extend("Push");
-    var query = new Parse.Query(Push);
-    query.equalTo("date", request.object.get('date'));
-    query.find({
-        success: function(results){
-            var conflict = false;
-            _.each(results, function(push){
-                if(push.get('approved')){
-                    conflict = true;
-                }
-            })
-
-            if(conflict){
-                response.error("Error: another deal is scheduled already");
-            } else {
-                response.success(request.object);
-            }
-        },
-        error: function(error){
-            response.error("Error: " + error.code + " " + error.message);
-        }
+    var query = new Parse.Query(Parse.Installation);
+    query.equalTo('channels', request.params.community);
+    query.count({
+    success: function(count) {
+        // The count request succeeded. Show the count
+        response.success(count);
+      },
+      error: function(error) {
+        // The request failed
+        response.error(error);
+      }
     });
 });
 

@@ -18,14 +18,29 @@ Parse.Cloud.beforeSave("Deal", function(request, response) {
     }
 
     var Deal = Parse.Object.extend("Deal");
-    var query = new Parse.Query(Deal);
-    query.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
-    query.lessThanOrEqualTo("deal_start_date", dayEnd.toDate());
-    query.equalTo('venue',request.object.get('venue'));
-    query.ascending("deal_start_date");
+    var sameDay = new Parse.Query(Deal);
+    sameDay.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
+    sameDay.lessThanOrEqualTo("deal_start_date", dayEnd.toDate());
+    sameDay.equalTo('venue',request.object.get('venue'));
+    sameDay.equalTo('venue',request.object.get('venue'));
+    sameDay.notEqualTo('objectId',request.object.get('objectId'));
+
+    var sameMain = new Parse.Query(Deal);
+    sameMain.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
+    sameMain.lessThanOrEqualTo("deal_start_date", dayEnd.toDate());
+    sameMain.equalTo('main',true);
+
+    var query = null;
+    if(request.object.get('main')){
+        query = Parse.Query.or(sameMain,sameDay);
+    } else {
+        query = sameDay;
+    }
+    
     query.find({
         success: function(results){
             if(!err.happened){
+                console.log(results);
                 if(results.length > 0){
                     err.happened = true;
                     err.message = "Error: another deal is scheduled for that day at this venue"
@@ -140,10 +155,10 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
 });
 
 Parse.Cloud.define("possibleMainDeals",function(request,response){
+    Parse.Cloud.useMasterKey();
     var Deal = Parse.Object.extend("Deal");
-    var notMain = new Parse.Query(Deal);
-    query.greaterThanOrEqualTo("deal_start_date", moment().add(3,'days').startOf('day'));
-    query.equalTo('community', request.params.community)
+    var query = new Parse.Query(Deal);
+    query.greaterThanOrEqualTo("deal_start_date", moment().add(3,'days').endOf('day').toDate());
     query.find({
         success: function(results){
             var out = [];
@@ -151,19 +166,19 @@ Parse.Cloud.define("possibleMainDeals",function(request,response){
                 if(!deal.get('main')){
                     var conflict = false;
                     _.each(results, function(compare) {
-                        if(compare.get('main')){
+                        if(compare.get('main') && compare.get('community_name') === deal.get('community_name')){
                             var dayStart = moment(compare.get('deal_start_date')).startOf('day');
                             var dayEnd = moment(compare.get('deal_start_date')).endOf('day');
                             if(moment(deal.get('deal_start_date')).isBetween(dayStart,dayEnd)){
                                 conflict = true;
                             }
                         }
-                    };
+                    });
                     if(!conflict){
                         out.push(deal);
                     }
-                }
-            }
+                };
+            });
             return response.success(out);
         },
         error: function(error){
