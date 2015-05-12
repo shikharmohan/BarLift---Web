@@ -390,11 +390,8 @@ Parse.Cloud.define("notGoing", function(request, response) {
             // if(deal.get("num_accepted") > 1){
             //     deal.increment("num_accepted", -1);
             // }
-            deal.save();
             user_query.get(userID, {
                 success: function(user) {
-                    console.log("Got user");
-                    console.log(user);
                     if(user.get("deals_redeemed") > 0){
                         user.increment("deals_redeemed", -1);
                     }

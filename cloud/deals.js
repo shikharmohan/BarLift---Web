@@ -39,7 +39,9 @@ Parse.Cloud.beforeSave("Deal", function(request, response) {
                 }
 
                 if(!err.happened){
-                    response.success(request.object);
+                    console.log("DEAL SAVED========")
+                    console.log(request.object.get("whos_going"));
+                    response.success();
                 } else {
                     response.error(err.message);
                 }
