@@ -355,7 +355,10 @@ Parse.Cloud.define("imGoing", function(request, response) {
                     user.increment("deals_redeemed", 1);
                     var newV = user.get("newVersion");
                     if(newV != undefined || newV != false){
-                        user.set("bar_visited", deal.get("venue").get("bar_name"));
+                        var b_name = deal.get("venue");
+                        if(b_name != undefined){
+                            user.set("bar_visited", b_name.get("bar_name"));
+                        }
                     }
                     var dr = user.relation("deal_list");
                     dr.add(deal);
