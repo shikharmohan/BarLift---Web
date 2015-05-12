@@ -90,8 +90,6 @@ Parse.Cloud.afterSave(Parse.User, function(request) {
         query = new Parse.Query(Parse.Role);
         query.get(request.object.get('Role').id, {
             success: function(object) {
-                console.log("role found");
-                console.log(object);
                 object.relation("users").add(request.object);
                 object.save();
             },
@@ -282,14 +280,15 @@ Parse.Cloud.job("addUserRoles", function(request, status){
     Parse.Cloud.useMasterKey();   // Query for all users
       
     var query = new Parse.Query(Parse.User);  
+    query.doesNotExist("Role");
     query.each(function(user) {       // Set and save the changes 
-        if(user.get('profile')){
+        if(!user.get("Role")){
             user.set("Role", {__type: "Pointer", className: "_Role", objectId: "uGBZhZM8LM"});
             user.save();
             return;
         }
     }).then(function(){
-        status.success("Set community & version");
+        status.success("Set Role");
     }, function(error){
         status.error("Uh oh, something went wrong.");
 

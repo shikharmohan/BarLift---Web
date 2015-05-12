@@ -7,15 +7,6 @@ Parse.Cloud.beforeSave("Deal", function(request, response) {
     var dayEnd = moment(request.object.get('deal_start_date')).endOf('day');
     var err = {happened: false, message: ''};
 
-    if(moment().isAfter(dayStart)){
-        err.happened = true;
-        err.message = "Error: You can't schedule deals in the past";
-    }
-
-    if(!err.happened && moment().add(3, 'days').isAfter(dayStart)){
-        err.happened = true;
-        err.message = "Error: You must schedule 3 days in advance";
-    }
 
     var Deal = Parse.Object.extend("Deal");
     var sameDay = new Parse.Query(Deal);
