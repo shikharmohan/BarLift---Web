@@ -4,7 +4,6 @@ var _ = require('underscore');
 Parse.Cloud.beforeSave("Deal", function(request, response) {
     var user = request.user;
     if(user && user.get('Role').objectId != "uGBZhZM8LM"){
-        console.log("============Checking for conflicts==============");
         var dayStart = moment(request.object.get('deal_start_date')).startOf('day');
         var dayEnd = moment(request.object.get('deal_start_date')).endOf('day');
         var err = {happened: false, message: ''};
