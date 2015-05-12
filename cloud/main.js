@@ -1,7 +1,10 @@
 require('cloud/app.js');
 require('cloud/newsletter.js');
 require('cloud/dashboard.js');
+require('cloud/deals.js');
+require('cloud/payments.js');
 var _ = require('underscore');
+var moment = require("cloud/moment");
 
 Parse.Cloud.define("hello", function(request, response) {
     response.success("Hello world!");
@@ -59,18 +62,23 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
     if(request.object.get("newVersion") == undefined || request.object.get("newVersion") == false){
         request.object.set("newVersion", false);
     }
-    var name = request.object.get("profile");
-    request.object.set("full_name", name["name"]);
-    if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
-        response.success();
-    } else if (request.object.get("nudges_left") < 0) {
-        request.object.set("nudges_left", 0);
-        request.object.save();
-        response.success();
+    if(request.object.get("profile")){
+        var name = request.object.get("profile");
+        request.object.set("full_name", name["name"]);
+        if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
+            response.success();
+        } else if (request.object.get("nudges_left") < 0) {
+            request.object.set("nudges_left", 0);
+            request.object.save();
+            response.success();
+        } else {
+            request.object.set("times_nudged", 0);
+            request.object.set("nudges_left", 10);
+            request.object.set("community_name", "Northwestern");
+            request.object.save();
+            response.success();
+        }
     } else {
-        request.object.set("times_nudged", 0);
-        request.object.set("nudges_left", 10);
-        request.object.set("community_name", "Northwestern");
         request.object.save();
         response.success();
     }
@@ -82,58 +90,15 @@ Parse.Cloud.afterSave(Parse.User, function(request) {
         query = new Parse.Query(Parse.Role);
         query.get(request.object.get('Role').id, {
             success: function(object) {
-                console.log("role found");
-                console.log(object);
                 object.relation("users").add(request.object);
                 object.save();
             },
             error: function(error) {
             }
         });
-    }
+    } 
 }); 
 
-// Deals
-Parse.Cloud.define("getCurrentDeal", function(request, response) {
-    var query = new Parse.Query("Deal");
-    query.equalTo("community_name", request.params.location);
-    var time = new Date();
-    var ms = time.valueOf();
-    console.log("Now : " + ms);
-    query.greaterThanOrEqualTo("end_utc", ms);
-    query.lessThanOrEqualTo("start_utc", ms);
-    query.limit(1);
-    query.include('user');
-    query.find({
-        success: function(deal) {
-            response.success(deal);
-        },
-        error: function(error) {
-            response.error("Search failed, no results.");
-        }
-    });
-});
-
-Parse.Cloud.define("getDeals", function(request, response) {
-    var query = new Parse.Query("Deal");
-    query.equalTo("community_name", request.params.location);
-    query.lessThan("createdAt", request.params.date);
-    query.include('user');
-    query.include('social');
-    query.first({
-        success: function(object) {
-            // Successfully retrieved the object.
-            if (object) {
-                response.success(object);
-            } else {
-                response.error("No object found");
-            }
-        },
-        error: function(error) {
-            response.error("Query failed.");
-        }
-    });
-});
 
 // Nudges
 Parse.Cloud.define("loadNudges", function(request, response) {
@@ -311,6 +276,24 @@ Parse.Cloud.job("v2_columnUpdate", function(request, status){
     })
 });
 
+Parse.Cloud.job("addUserRoles", function(request, status){
+    Parse.Cloud.useMasterKey();   // Query for all users
+      
+    var query = new Parse.Query(Parse.User);  
+    query.doesNotExist("Role");
+    query.each(function(user) {       // Set and save the changes 
+        if(!user.get("Role")){
+            user.set("Role", {__type: "Pointer", className: "_Role", objectId: "uGBZhZM8LM"});
+            user.save();
+            return;
+        }
+    }).then(function(){
+        status.success("Set Role");
+    }, function(error){
+        status.error("Uh oh, something went wrong.");
+
+    })
+});
 
 
 Parse.Cloud.job("splitGender", function(request, status) {   // Set up to modify user data
@@ -739,7 +722,7 @@ Parse.Cloud.define("getMyNudges", function(request, response){
 });
 
 Parse.Cloud.define("resetBadges", function(request, response) {
-        Parse.Cloud.useMasterKey();
+    Parse.Cloud.useMasterKey();
     var fb_id = request.user.get("fb_id");
     var query = new Parse.Query(Parse.Installation);
     query.equalTo('fb_id', fb_id);
@@ -760,83 +743,23 @@ Parse.Cloud.define("resetBadges", function(request, response) {
     });
 });
 
-
-Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up to modify user data
-      
-    Parse.Cloud.useMasterKey();   // Query for all users
-
-
-    var Deal = Parse.Object.extend("Deal");
-    var query = new Parse.Query(Deal);
-    query.get(request.params.dealId, function(deal) {
-        var relation = deal.relation("social");
-        var query = relation.query();
-        query.find({
-           success : function(results) {
-                response.success(processData(results));
-            },
-           error : function(error) {
-                response.error("Error: " + error.code + " " + error.message);
-           }
-        });
-    });
-
-    function processData(data){
-        var gender = {male: 0, female: 0};
-        var interestedCount = 0;
-        var nightsOut = [0,0,0,0,0,0,0,0];
-        var avgDealsRedeemed = 0;
-        _.each(data, function(user) {
-            if (user.get('profile').gender == 'female'){
-                gender.female += 1;
-            } else if (user.get('profile') && user.get('profile').gender == 'male'){
-                gender.male += 1;
-            }
-            interestedCount += 1;
-            if (user.get('num_nights') && user.get('num_nights') != 'Choose a number...'){
-                nightsOut[parseInt(user.get('num_nights'))] += 1;
-            }
-            if (user.get('deals_redeemed')){
-                avgDealsRedeemed += parseInt(user.get('deals_redeemed'));
-            }
-        });
-        avgDealsRedeemed = avgDealsRedeemed / interestedCount;
-
-        return {
-            gender: gender,
-            interestedCount: interestedCount,
-            nightsOut: nightsOut,
-            avgDealsRedeemed: avgDealsRedeemed
-        };
-    }
-});
-
-Parse.Cloud.beforeSave("Push", function(request, response) {
+Parse.Cloud.define("pushCount",function(request,response){
     Parse.Cloud.useMasterKey();
-    var today = new Date();
-    var Push = Parse.Object.extend("Push");
-    var query = new Parse.Query(Push);
-    query.equalTo("date", request.object.get('date'));
-    query.find({
-        success: function(results){
-            var conflict = false;
-            _.each(results, function(push){
-                if(push.get('approved')){
-                    conflict = true;
-                }
-            })
-
-            if(conflict){
-                response.error("Error: another deal is scheduled already");
-            } else {
-                response.success(request.object);
-            }
-        },
-        error: function(error){
-            response.error("Error: " + error.code + " " + error.message);
-        }
+    var query = new Parse.Query(Parse.Installation);
+    query.equalTo('channels', request.params.community);
+    query.count({
+    success: function(count) {
+        // The count request succeeded. Show the count
+        response.success(count);
+      },
+      error: function(error) {
+        // The request failed
+        response.error(error);
+      }
     });
 });
+
+
 
 
 

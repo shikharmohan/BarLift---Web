@@ -101,7 +101,7 @@ Parse.Cloud.define("afterDealEmails", function(request, response) {
 
             // update email sent for deal 
             deal.set("email_sent", true);
-            //deal.save();
+            deal.save();
         }
 
     }).then(function(success) {
