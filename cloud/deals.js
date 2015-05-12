@@ -20,6 +20,7 @@ Parse.Cloud.beforeSave("Deal", function(request, response) {
     sameMain.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
     sameMain.lessThanOrEqualTo("deal_start_date", dayEnd.toDate());
     sameMain.equalTo('main',true);
+    sameMain.notEqualTo('objectId',request.object.get('objectId'));
 
     var query = null;
     if(request.object.get('main')){
