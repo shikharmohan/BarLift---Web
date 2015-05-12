@@ -7,7 +7,8 @@ Parse.Cloud.beforeSave("Deal", function(request, response) {
         var dayStart = moment(request.object.get('deal_start_date')).startOf('day');
         var dayEnd = moment(request.object.get('deal_start_date')).endOf('day');
         var err = {happened: false, message: ''};
-
+        request.object.set('start_utc', parseInt(moment(request.object.get('deal_start_date')).format('x')));
+        request.object.set('end_utc', parseInt(moment(request.object.get('deal_end_date')).format('x')));
 
         var Deal = Parse.Object.extend("Deal");
         var sameDay = new Parse.Query(Deal);
