@@ -52,16 +52,17 @@ Parse.Cloud.define("getUpComingInvoice", function(request, response) {
     var user = request.user;
     if(user.get('stripe')){
       var stripe = user.get('stripe');
-      Stripe.InvoiceItems.list(stripe.id).then(
-        function(res){
-          console.log(res);
-          response.success(res);
-        },
-        function(res){
-          console.log(res);
-          response.error(res);
+      Parse.Cloud.httpRequest({
+        url: 'https://api.stripe.com/v1/invoices/upcoming',
+        params: {customer: stripe.id},
+        headers: {
+          'Authorization': 'Bearer sk_test_76F3sfjMWNDAjAbb66hD0vNo'
         }
-      );
+      }).then(function(res) {
+        response.success(res);
+      }, function(res) {
+        response.error(res);
+      });
     } else {
       response.error('Missing payment info');
     }
