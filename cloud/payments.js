@@ -47,3 +47,24 @@ Parse.Cloud.define("buyPush", function(request, response) {
       }
     });
 });
+
+
+Parse.Cloud.define("getUpComingInvoice", function(request, response) {
+    var user = request.user;
+    if(user.get('stripe')){
+      var stripe = user.get('stripe');
+      Parse.Cloud.httpRequest({
+        url: 'https://api.stripe.com/v1/invoices/upcoming',
+        params: {customer: stripe.id},
+        headers: {
+          'Authorization': 'Bearer sk_test_76F3sfjMWNDAjAbb66hD0vNo'
+        }
+      }).then(function(res) {
+        response.success(res);
+      }, function(res) {
+        response.error(res);
+      });
+    } else {
+      response.error('Missing payment info');
+    }
+});

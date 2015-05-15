@@ -64,6 +64,7 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
     }
     if(request.object.get("profile")){
         var name = request.object.get("profile");
+        request.object.set("Role", {__type: "Pointer", className: "_Role", objectId: "uGBZhZM8LM"});
         request.object.set("full_name", name["name"]);
         if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
             response.success();
@@ -280,46 +281,6 @@ Parse.Cloud.job("v2_columnUpdate", function(request, status){
     })
 });
 
-Parse.Cloud.job("addUserRoles", function(request, status){
-    Parse.Cloud.useMasterKey();   // Query for all users
-      
-    var query = new Parse.Query(Parse.User);  
-    query.doesNotExist("Role");
-    query.each(function(user) {       // Set and save the changes 
-        if(!user.get("Role")){
-            user.set("Role", {__type: "Pointer", className: "_Role", objectId: "uGBZhZM8LM"});
-            user.save();
-            return;
-        }
-    }).then(function(){
-        status.success("Set Role");
-    }, function(error){
-        status.error("Uh oh, something went wrong.");
-
-    })
-});
-
-
-Parse.Cloud.job("splitGender", function(request, status) {   // Set up to modify user data
-      
-    Parse.Cloud.useMasterKey();   // Query for all users
-      
-    var query = new Parse.Query(Parse.User);  
-    query.each(function(user) {       // Set and save the changes 
-        if(user.get('profile') != undefined){
-            var gender = user.get('profile').gender;
-            user.set("gender", gender);      
-            user.save();
-        }
-        return;
-    }).then(function() {
-        // Set the job's success status
-        status.success("Gender split!");
-    }, function(error) {
-        // Set the job's error status
-        status.error("Uh oh, something went wrong.");
-    });
-});
 
 // Social
 Parse.Cloud.define("imGoing", function(request, response) {
@@ -399,8 +360,6 @@ Parse.Cloud.define("notGoing", function(request, response) {
             // }
             user_query.get(userID, {
                 success: function(user) {
-                    console.log("Got user");
-                    console.log(user);
                     if(user.get("deals_redeemed") > 0){
                         user.increment("deals_redeemed", -1);
                     }

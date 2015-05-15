@@ -2,55 +2,59 @@ var moment = require("cloud/moment");
 var _ = require('underscore');
 
 Parse.Cloud.beforeSave("Deal", function(request, response) {
-    Parse.Cloud.useMasterKey();
-    var dayStart = moment(request.object.get('deal_start_date')).startOf('day');
-    var dayEnd = moment(request.object.get('deal_start_date')).endOf('day');
-    var err = {happened: false, message: ''};
+    var user = request.user;
+    if(user && user.get('Role').objectId != "uGBZhZM8LM"){
+        var dayStart = moment(request.object.get('deal_start_date')).startOf('day');
+        var dayEnd = moment(request.object.get('deal_start_date')).endOf('day');
+        var err = {happened: false, message: ''};
+        request.object.set('start_utc', parseInt(moment(request.object.get('deal_start_date')).format('x')));
+        request.object.set('end_utc', parseInt(moment(request.object.get('deal_end_date')).format('x')));
 
+        var Deal = Parse.Object.extend("Deal");
+        var sameDay = new Parse.Query(Deal);
+        sameDay.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
+        sameDay.lessThanOrEqualTo("deal_start_date", dayEnd.toDate());
+        sameDay.equalTo('venue',request.object.get('venue'));
+        sameDay.equalTo('venue',request.object.get('venue'));
+        sameDay.notEqualTo('objectId',request.object.get('objectId'));
 
-    var Deal = Parse.Object.extend("Deal");
-    var sameDay = new Parse.Query(Deal);
-    sameDay.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
-    sameDay.lessThanOrEqualTo("deal_start_date", dayEnd.toDate());
-    sameDay.equalTo('venue',request.object.get('venue'));
-    sameDay.equalTo('venue',request.object.get('venue'));
-    sameDay.notEqualTo('objectId',request.object.get('objectId'));
+        var sameMain = new Parse.Query(Deal);
+        sameMain.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
+        sameMain.lessThanOrEqualTo("deal_start_date", dayEnd.toDate());
+        sameMain.equalTo('main',true);
+        sameMain.notEqualTo('objectId',request.object.get('objectId'));
 
-    var sameMain = new Parse.Query(Deal);
-    sameMain.greaterThanOrEqualTo("deal_start_date", dayStart.toDate());
-    sameMain.lessThanOrEqualTo("deal_start_date", dayEnd.toDate());
-    sameMain.equalTo('main',true);
-    sameMain.notEqualTo('objectId',request.object.get('objectId'));
-
-    var query = null;
-    if(request.object.get('main')){
-        query = Parse.Query.or(sameMain,sameDay);
-    } else {
-        query = sameDay;
-    }
-    
-    query.find({
-        success: function(results){
-            if(!err.happened){
-                console.log(results);
-                if(results.length > 0){
-                    err.happened = true;
-                    err.message = "Error: another deal is scheduled for that day at this venue"
-                }
-
+        var query = null;
+        if(request.object.get('main')){
+            query = Parse.Query.or(sameMain,sameDay);
+        } else {
+            query = sameDay;
+        }
+        
+        query.find({
+            success: function(results){
                 if(!err.happened){
-                    response.success(request.object);
+                    if(results.length > 0){
+                        err.happened = true;
+                        err.message = "Error: another deal is scheduled for that day at this venue"
+                    }
+
+                    if(!err.happened){
+                        response.success();
+                    } else {
+                        response.error(err.message);
+                    }
                 } else {
                     response.error(err.message);
                 }
-            } else {
-                response.error(err.message);
+            },
+            error: function(error){
+                response.error("Error: " + error.code + " " + error.message);
             }
-        },
-        error: function(error){
-            response.error("Error: " + error.code + " " + error.message);
-        }
-    });
+        });
+    } else {
+        response.success();
+    }
 });
 
 
