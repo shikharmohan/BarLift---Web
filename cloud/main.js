@@ -97,6 +97,10 @@ Parse.Cloud.afterSave(Parse.User, function(request) {
             }
         });
     } 
+    if(request.object.get('university_name') == "Kellogg" || request.object.get('university_name') == "Northwestern"){
+    	request.object.set('community_name', 'Northwestern');
+    	request.object.save();
+    }
 }); 
 
 
@@ -393,7 +397,6 @@ Parse.Cloud.define("notGoing", function(request, response) {
             // if(deal.get("num_accepted") > 1){
             //     deal.increment("num_accepted", -1);
             // }
-            deal.save();
             user_query.get(userID, {
                 success: function(user) {
                     console.log("Got user");
