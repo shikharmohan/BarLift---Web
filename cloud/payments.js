@@ -48,6 +48,7 @@ Parse.Cloud.define("buyPush", function(request, response) {
     });
 });
 
+
 Parse.Cloud.define("getUpComingInvoice", function(request, response) {
     var user = request.user;
     if(user.get('stripe')){
