@@ -151,34 +151,45 @@ Parse.Cloud.define("dealAnalytics", function(request, response) {   // Set up 
 });
 
 Parse.Cloud.define("possibleMainDeals",function(request,response){
+    var user = request.user;
     Parse.Cloud.useMasterKey();
     var Deal = Parse.Object.extend("Deal");
-    var query = new Parse.Query(Deal);
-    query.greaterThanOrEqualTo("deal_start_date", moment().add(3,'days').endOf('day').toDate());
-    query.find({
-        success: function(results){
-            var out = [];
-            _.each(results, function(deal) {
-                if(!deal.get('main')){
-                    var conflict = false;
-                    _.each(results, function(compare) {
-                        if(compare.get('main') && compare.get('community_name') === deal.get('community_name')){
-                            var dayStart = moment(compare.get('deal_start_date')).startOf('day');
-                            var dayEnd = moment(compare.get('deal_start_date')).endOf('day');
-                            if(moment(deal.get('deal_start_date')).isBetween(dayStart,dayEnd)){
-                                conflict = true;
+    var roleQuery = new Parse.Query(Parse.Role);
+    var role = user.get('Role')
+    roleQuery.get(user.get('Role').id, function(userRole){
+        var query = new Parse.Query(Deal);
+        query.greaterThanOrEqualTo("deal_start_date", moment().endOf('day').toDate());
+        query.find({
+            success: function(results){
+                var out = [];
+                _.each(results, function(deal) {
+                    if(!deal.get('main')){
+                        var conflict = false;
+                        _.each(results, function(compare) {
+                            if(compare.get('main') && compare.get('community_name') === deal.get('community_name')){
+                                var dayStart = moment(compare.get('deal_start_date')).startOf('day');
+                                var dayEnd = moment(compare.get('deal_start_date')).endOf('day');
+                                if(moment(deal.get('deal_start_date')).isBetween(dayStart,dayEnd)){
+                                    conflict = true;
+                                }
                             }
+                        });
+                        if(!conflict){
+                            deal.set('eligible_main', true)
+                        } else {
+                            deal.set('eligible_main', false)
                         }
-                    });
-                    if(!conflict){
-                        out.push(deal);
+                        deal.save()
                     }
-                };
-            });
-            return response.success(out);
-        },
-        error: function(error){
-            response.error("Error: " + error.code + " " + error.message);
-        }
+                    if(deal.getACL().getRoleReadAccess(userRole)){
+                        out.push(deal)
+                    }
+                });
+                return response.success(out);
+            },
+            error: function(error){
+                response.error("Error: " + error.code + " " + error.message);
+            }
+        });
     });
 });
