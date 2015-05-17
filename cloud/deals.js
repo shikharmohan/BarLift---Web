@@ -181,7 +181,7 @@ Parse.Cloud.define("possibleMainDeals",function(request,response){
                         }
                         deal.save()
                     }
-                    if(deal.getACL().getRoleReadAccess(userRole)){
+                    if(deal.getACL().getRoleReadAccess(userRole) || deal.getACL().getReadAccess(user.id)){
                         out.push(deal)
                     }
                 });
