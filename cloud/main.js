@@ -63,23 +63,25 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
     if(request.object.get("newVersion") == undefined || request.object.get("newVersion") == false){
         request.object.set("newVersion", false);
     }
-    if(request.object.get("profile")){
+    if(!request.object.get("Role") ||  !request.object.get("full_name")){
+        console.log("=================adding role=====================");
         var name = request.object.get("profile");
-        request.object.set("Role", {__type: "Pointer", className: "_Role", objectId: "uGBZhZM8LM"});
-        request.object.set("full_name", name["name"]);
-        if (request.object.get("nudges_left") >= 0 && request.object.get("nudges_left") <= 10) {
-            response.success();
-        } else if (request.object.get("nudges_left") < 0) {
-            request.object.set("nudges_left", 0);
-            request.object.save();
-            response.success();
-        } else {
-            request.object.set("times_nudged", 0);
-            request.object.set("nudges_left", 10);
-            request.object.set("community_name", "Northwestern");
-            request.object.save();
-            response.success();
+        if(name && name["name"]){
+            request.object.set("full_name", name["name"]);
         }
+        query = new Parse.Query(Parse.Role);
+        query.get("uGBZhZM8LM", {
+            success: function(object) {
+                request.object.set("Role", object);
+                request.object.save();
+                response.success();
+            },
+            error: function(error) {
+                console.log("=================ROLE NOT FOUND=====================");
+                request.object.save();
+                response.success();
+            }
+        });
     } else {
         request.object.save();
         response.success();
