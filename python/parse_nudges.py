@@ -36,6 +36,7 @@ def get_nudges(page_num, session, d):
 
     targets = find_tags(html, 'span', 'has_tooltip')
     times = find_tags(html, 'td', 'push_time')
+    date = "none"
 
     for target, time in zip(targets, times):
         target = strip_tags(str(target)).strip().split()[0]    # target type (segment, everyone, or channels)
@@ -55,7 +56,8 @@ def get_all_nudges(num_pages):
 
 #get_nudges(1, pickle.load(open('parse_session.pickle', 'rb')), {})
 
-d = get_all_nudges(24)
+# store_new_session()
+d = get_all_nudges(57)
 #d = pickle.load(open('nudges_data.pickle', 'rb'))
 nudges_data = [(date, nudges) for date, nudges in sorted(d.items(), key=lambda p: p[0], reverse=True)]
 pprint(nudges_data)

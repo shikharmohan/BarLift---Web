@@ -72,7 +72,8 @@ Parse.Cloud.define("afterDealEmails", function(request, response) {
         var num_pushes;
 
         // send email if deal ended and email not already sent
-        if (current_time > end_time && email_sent === undefined) {
+        // if (current_time > end_time && email_sent === undefined) {
+        if (deal.id == "bbX4swPeGA") {
             // fill in template
             var html = compiled(
                 {
