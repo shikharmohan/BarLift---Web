@@ -64,7 +64,6 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
         request.object.set("newVersion", false);
     }
     if(!request.object.get("Role") ||  !request.object.get("full_name")){
-        console.log("=================adding role=====================");
         var name = request.object.get("profile");
         if(name && name["name"]){
             request.object.set("full_name", name["name"]);
@@ -72,12 +71,13 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
         query = new Parse.Query(Parse.Role);
         query.get("uGBZhZM8LM", {
             success: function(object) {
-                request.object.set("Role", object);
+                if(!request.object.get("Role")){
+                    request.object.set("Role", object);
+                }
                 request.object.save();
                 response.success();
             },
             error: function(error) {
-                console.log("=================ROLE NOT FOUND=====================");
                 request.object.save();
                 response.success();
             }
