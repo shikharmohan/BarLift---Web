@@ -57,8 +57,6 @@ Parse.Cloud.define("getUsers", function(request, response) {  
 
 
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
-    request.object.set('community_name', 'Northwestern');
-    request.object.save();
     // request.object.set("community_v2", []);
     if(request.object.get("newVersion") == undefined || request.object.get("newVersion") == false){
         request.object.set("newVersion", false);
@@ -101,10 +99,6 @@ Parse.Cloud.afterSave(Parse.User, function(request) {
             }
         });
     } 
-    if(request.object.get('university_name') == "Kellogg" || request.object.get('university_name') == "Northwestern"){
-    	request.object.set('community_name', 'Northwestern');
-    	request.object.save();
-    }
 }); 
 
 
