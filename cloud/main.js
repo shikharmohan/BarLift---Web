@@ -99,8 +99,6 @@ Parse.Cloud.afterSave(Parse.User, function(request) {
             }
         });
     } 
-    request.object.set('community_name', 'Northwestern');
-    request.object.save();
     if(request.object.get('university_name') == "Kellogg" || request.object.get('university_name') == "Northwestern"){
     	request.object.set('community_name', 'Northwestern');
     	request.object.save();
