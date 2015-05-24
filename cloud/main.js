@@ -57,7 +57,13 @@ Parse.Cloud.define("getUsers", function(request, response) {  
 
 
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
-    request.object.set('community_name', 'Northwestern');
+
+    if(request.object.get('university_name') == 'DePaul' || request.object.get('university_name') == 'DEPAUL'){
+        request.object.set('community_name', 'DePaul');
+    }
+    else{
+         request.object.set('community_name', 'Northwestern');
+    }
     request.object.save();
     // request.object.set("community_v2", []);
     if(request.object.get("newVersion") == undefined || request.object.get("newVersion") == false){
