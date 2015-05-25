@@ -1,5 +1,7 @@
 var Stripe = require('stripe');
 Stripe.initialize('sk_test_76F3sfjMWNDAjAbb66hD0vNo');
+var _ = require('underscore');
+var moment = require("cloud/moment");
 
 
 Parse.Cloud.define("subscribe", function(request, response) {
@@ -68,3 +70,43 @@ Parse.Cloud.define("getUpComingInvoice", function(request, response) {
       response.error('Missing payment info');
     }
 });
+
+Parse.Cloud.job("billMonth", function(request, status) {   // Set up to modify user data
+    if(moment().dayOfYear() === moment().startOf('month').dayOfYear()){
+      Parse.Cloud.useMasterKey();   // Query for all users
+      var Invoice = Parse.Object.extend("Invoice");
+      var query = (new Parse.Query(Parse.Role));
+      query.equalTo("name", "Bar");
+      query.first({ success: function(role) {
+        role.relation('users').query().find({
+          success: function(users) {
+            _.each(users, function(user){
+              if(user.get('sub_price')){
+                var inv = new Invoice();
+                inv.set('amount', user.get('sub_price'));
+                inv.set('user', user);
+                inv.set('type', 'subscription');
+                inv.set('description', {text: "Subscription for "+ moment().format("MMMM")});
+                var invACL = new Parse.ACL();
+                invACL.setPublicReadAccess(false);
+                invACL.setPublicWriteAccess(false);
+                invACL.setRoleReadAccess('Admin', true);
+                invACL.setRoleWriteAccess('Admin', true);
+                invACL.setReadAccess(user, true);
+                invACL.setWriteAccess(user, false);
+                inv.setACL(invACL);
+                inv.save();
+              }
+            });
+            status.success("Month billed");
+          },
+          error: function(error){
+            status.error("Uh oh, something went wrong.");
+          }
+        })
+      }});
+    } else {
+      status.success("Not start of month");
+    }
+});
+
