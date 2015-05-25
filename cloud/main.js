@@ -688,6 +688,15 @@ Parse.Cloud.define("getMyNudges", function(request, response){
 
 });
 
+Parse.Cloud.define("updateSub", function(request, response){
+    Parse.Cloud.useMasterKey();
+    var user = new Parse.User();
+    user.id = request.params.userID;
+    user.set('sub_price', request.params.sub_price);
+    user.save();
+    response.success();
+});
+
 Parse.Cloud.define("resetBadges", function(request, response) {
     Parse.Cloud.useMasterKey();
     var fb_id = request.user.get("fb_id");
