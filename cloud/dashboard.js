@@ -17,16 +17,16 @@ Parse.Cloud.define("getNudgesByHour", function(request, response) {
     });
 });
 
-Parse.Cloud.define("getDealUsers", function(request, response) {
+Parse.Cloud.define("getUsersForDeal", function(request, response) {
     Parse.Cloud.useMasterKey();
 
     var Deal = Parse.Object.extend("Deal");
     var dealQuery = new Parse.Query(Deal);
 
-    dealQuery.get(request.params.dealID, function(deal) {
+    dealQuery.get(request.params.dealId, function(deal) {
         var relation = deal.relation("social");
         var userQuery = relation.query();
-        // var groupsDict = {};
+        var groupsDict = {};
 
         userQuery.find(function(users) { 
             // for (var i = 0; i < users.length; i++) {
