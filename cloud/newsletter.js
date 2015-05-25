@@ -27,8 +27,8 @@ Parse.Cloud.define("sendEmail", function(request, response) {
 });
 
 Parse.Cloud.define("pushesSent", function(request, response) {
-
     Parse.Cloud.useMasterKey();
+
     var query = new Parse.Query(Parse.Installation);
     var numPushes = 0;
 
@@ -43,15 +43,6 @@ Parse.Cloud.define("pushesSent", function(request, response) {
 
 });
 
-Parse.Cloud.define("emailTest", function(request, response) {
-    // Set up to modify data
-    Parse.Cloud.useMasterKey();
-
-    // query for all deals including users
-    var deal_query = new Parse.Query("Deal");
-    deal_query.include("user");
-
-});
 
 Parse.Cloud.define("afterDealEmails", function(request, response) {
     // Set up to modify data
@@ -113,4 +104,21 @@ Parse.Cloud.define("afterDealEmails", function(request, response) {
         response.error("Uh oh, something went wrong.");
     });
 
+});
+
+Parse.Cloud.define("getDeal", function(request, response) {
+    Parse.Cloud.useMasterKey();
+
+    var query = new Parse.Query("Deal");
+    query.equalTo("objectId", request.params.dealId);
+    query.include('feedback');
+
+    query.find({
+        success: function(deal) {
+            response.success(deal);
+        },
+        error: function(error) {
+            response.error("Query failed.");
+        }
+    });
 });

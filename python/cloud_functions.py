@@ -2,7 +2,7 @@ import json,httplib
 
 connection = httplib.HTTPSConnection('api.parse.com', 443)
 connection.connect()
-connection.request('POST', '/1/functions/getUsersForDeal', json.dumps({ "dealId": "5XWDA4z1vo"
+connection.request('POST', '/1/functions/getDeal', json.dumps({ "dealId": "5XWDA4z1vo"
      }), {
        "X-Parse-Application-Id": "5DZi1FrdZcwBKXIxMplWsqYu3cEEumlmFDB1kKnC",
        "X-Parse-REST-API-Key": "pMT9AefpMkJfbcJ5fTA2uOGxwpitMII7hpCt8x4O",
