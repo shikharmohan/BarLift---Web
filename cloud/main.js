@@ -741,6 +741,42 @@ Parse.Cloud.define("pushCount",function(request,response){
 });
 
 
+Parse.Cloud.job("reloadNudges", function(request, status) {   // Set up to modify user data
+      
+    Parse.Cloud.useMasterKey();   // Query for all users
+      
+    var query = new Parse.Query(Parse.User);  
+    query.each(function(user) {       // Set and save the changes 
+              
+        user.set("nudges_left", 10);      
+        user.save();
+        return;
+    }).then(function() {
+        // Set the job's success status
+        status.success("Reloaded nudges!");
+    }, function(error) {
+        // Set the job's error status
+        status.error("Uh oh, something went wrong.");
+    });
+});
+Parse.Cloud.job("addUniv", function(request, status){
+    Parse.Cloud.useMasterKey();
+    var query = new Parse.Query(Parse.Installation);
+    query.include("user");
+    query.each(function(inst){
+        var user = inst.get("user");
+        if(user != undefined){
+            var univ = user.get("university_name");
+            if(univ != undefined){
+                inst.set('university',univ);
+            }
+        }
+    }).then(function(){
+        status.success("Successssss!");
+    }, function(error){
+        status.error("Uh oh, something went wrong.");
+    })
+});
 
 
 
