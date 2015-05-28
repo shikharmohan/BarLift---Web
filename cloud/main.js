@@ -741,34 +741,20 @@ Parse.Cloud.define("pushCount",function(request,response){
 });
 
 
-Parse.Cloud.job("reloadNudges", function(request, status) {   // Set up to modify user data
-      
-    Parse.Cloud.useMasterKey();   // Query for all users
-      
-    var query = new Parse.Query(Parse.User);  
-    query.each(function(user) {       // Set and save the changes 
-              
-        user.set("nudges_left", 10);      
-        user.save();
-        return;
-    }).then(function() {
-        // Set the job's success status
-        status.success("Reloaded nudges!");
-    }, function(error) {
-        // Set the job's error status
-        status.error("Uh oh, something went wrong.");
-    });
-});
+
 Parse.Cloud.job("addUniv", function(request, status){
     Parse.Cloud.useMasterKey();
     var query = new Parse.Query(Parse.Installation);
     query.include("user");
     query.each(function(inst){
-        var user = inst.get("user");
-        if(user != undefined){
-            var univ = user.get("university_name");
-            if(univ != undefined){
-                inst.set('university',univ);
+        if(inst.get('university') == undefined){
+            var user = inst.get("user");
+            if(user != undefined){
+                var univ = user.get("university_name");
+                if(univ != undefined){
+                    inst.set('university',univ);
+                    inst.save();
+                }
             }
         }
     }).then(function(){
@@ -779,6 +765,27 @@ Parse.Cloud.job("addUniv", function(request, status){
 });
 
 
+Parse.Cloud.job("affiliationAdd", function(request, status){
+    Parse.Cloud.useMasterKey();
+    var query = new Parse.Query(Parse.Installation);
+    query.include("user");
+    query.each(function(inst){
+        if(inst.get('affiliation') == undefined){
+            var user = inst.get("user");
+            if(user != undefined){
+                var aff = user.get("affiliation");
+                if(aff != undefined){
+                    inst.set('affiliation',aff);
+                    inst.save();
+                }
+            }
+        }
+    }).then(function(){
+        status.success("Successssss!");
+    }, function(error){
+        status.error("Uh oh, something went wrong.");
+    })
+});
 
 
 
