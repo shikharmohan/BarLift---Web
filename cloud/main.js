@@ -477,7 +477,9 @@ Parse.Cloud.define("getWhosGoing", function(request, response) {
                                 var profile = list[i].get("profile");
                                 fb = list[i].get("fb_id");
                                 if(fb != request.user.get("fb_id")){
-                                    result.push({"name":profile["name"], "fb_id":list[i].get("fb_id")});
+                                    if(profile && profile != undefined){
+                                        result.push({"name":profile["name"], "fb_id":list[i].get("fb_id")}); 
+                                    }
                                 }
                                 else{
                                     myIdx = i;
@@ -534,7 +536,9 @@ Parse.Cloud.define("getInterestedOthers", function(request, response) {
                         success: function(list) {
                             for (var i = 0; i < list.length; i++) {
                                 var profile = list[i].get("profile");
-                                result.push([profile["name"], list[i].get("fb_id")]);
+                                if(profile){
+                                    result.push([profile["name"], list[i].get("fb_id")]);
+                                }
                             }
                             var uniqueArray = result.filter(function(elem, pos) {
                                 return result.indexOf(elem) == pos;
@@ -787,6 +791,38 @@ Parse.Cloud.job("affiliationAdd", function(request, status){
     })
 });
 
+
+Parse.Cloud.job("growthHack", function(request, status){
+    Parse.Cloud.useMasterKey();
+    var query = new Parse.Query("Deal");
+    query.get("hdStaK10Mw",{
+        success: function(object){
+            var userQ = new Parse.Query(Parse.User);
+            userQ.limit(13);
+            userQ.equalTo('newVersion', false);
+            userQ.ascending('createdAt');
+            var social = object.relation('social');
+            userQ.find({
+                success: function(results){
+                    for(var i = 0; i < results.length; i++){
+                        social.add(results[i]);
+                    }
+                    object.save();
+                    status.success("Scuuuccuess");
+                },
+                error: function(error){
+                    status.error(error);
+                }
+            });
+
+        },
+        error: function(object, error){
+            status.error("Something went wrong");
+        }
+    });
+
+
+});
 
 
 
